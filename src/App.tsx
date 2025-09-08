@@ -1,13 +1,13 @@
+import { BrowserRouter } from "react-router-dom";
 import AppLayout from "@/components/layout/AppLayout";
-import AppRoutes from "@/routes/router";
-import "./index.css"; // Tailwind ( @tailwind base/components/utilities )
+import Router from "@/routes/router"; // <Routes>를 return하는 컴포넌트
 
-function App() {
+export default function App() {
   return (
-    <AppLayout>
-      <AppRoutes />
-    </AppLayout>
+    <BrowserRouter>
+      <AppLayout>
+        <Router />
+      </AppLayout>
+    </BrowserRouter>
   );
 }
-
-export default App;
