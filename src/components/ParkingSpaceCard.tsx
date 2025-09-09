@@ -1,12 +1,12 @@
 import React from "react";
 
 type ParkingSpaceCardProps = {
-  name: string; // 빌라/공간 이름
-  location: string; // 위치 라벨 (예: 북문 근처)
-  points: number; // 포인트 (숫자, 예: 2500)
-  remainingMinutes?: number; // 선택: 남은 시간(분)
-  timeWindow?: string; // 선택: 이용 가능 시간대 (예: "09:00 ~ 11:00")
-  thumbnailUrl?: string; // 선택: 썸네일 이미지
+  name: string;
+  location: string;
+  points: number;
+  remainingMinutes?: number;
+  timeWindow?: string;
+  thumbnailUrl?: string;
 };
 
 export default function ParkingSpaceCard({
@@ -20,84 +20,69 @@ export default function ParkingSpaceCard({
   const formattedPoints = `${points.toLocaleString("ko-KR")}P`;
 
   return (
-    <div className="w-95 p-2.5 bg-white rounded-lg inline-flex justify-start items-start gap-1 overflow-hidden">
-      {/* 썸네일 */}
-      <div className="w-24 h-28 relative overflow-hidden rounded-lg bg-amber-100">
-        {thumbnailUrl ? (
+    <div
+      className="
+        w-full p-3 bg-white rounded-lg
+        flex items-center gap-3
+      "
+    >
+      {/* 썸네일: 고정 크기 + 가운데 정렬 */}
+      <div
+        className="
+          relative w-24 h-28 flex-shrink-0 overflow-hidden rounded-lg bg-amber-100
+        "
+      >
+        {thumbnailUrl && (
           // eslint-disable-next-line @next/next/no-img-element
           <img
             src={thumbnailUrl}
             alt={`${name} thumbnail`}
             className="w-full h-full object-cover"
           />
-        ) : null}
+        )}
       </div>
 
       {/* 본문 */}
-      <div className="w-60 p-1 inline-flex flex-col justify-center items-start overflow-hidden">
-        {/* 상단: 이름 + 남은시간 배지(선택) */}
-        <div className="pl-1 self-stretch inline-flex justify-between items-center overflow-hidden">
-          <div className="max-w-[70%] truncate text-black text-base font-semibold font-['Pretendard'] leading-7">
+      <div className="flex-1 min-w-0 flex flex-col gap-1">
+        {/* 상단: 이름 + 남은시간 */}
+        <div className="flex justify-between items-center gap-2">
+          <div className="truncate text-black text-base font-semibold leading-6">
             {name}
           </div>
 
           {typeof remainingMinutes === "number" && remainingMinutes >= 0 && (
-            <div className="h-4 px-1 py-2 bg-green-100 rounded-xl outline outline-1 outline-offset-[-1px] outline-green-500 flex items-center overflow-hidden">
-              <div className="text-green-500 text-[10px] font-semibold font-['Pretendard'] leading-none">
+            <div className="px-2 h-5 bg-green-100 rounded-full outline outline-1 outline-green-500 flex items-center">
+              <span className="text-green-600 text-[11px] font-semibold leading-none">
                 {remainingMinutes}분 남음
-              </div>
+              </span>
             </div>
           )}
         </div>
 
         {/* 위치 */}
-        <div className="w-56 p-1 inline-flex justify-start items-center gap-1 overflow-hidden">
-          {/* 아이콘 */}
-          <div className="w-3 h-3 flex justify-center items-center overflow-hidden">
-            <img
-              src="/assets/location.svg"
-              alt="location icon"
-              className="w-3 h-3"
-            />
-          </div>
-          {/* 글자 */}
-          <div className="flex items-center overflow-hidden">
-            <div className="text-neutral-600 text-xs font-medium font-['Pretendard'] leading-5">
-              {location}
-            </div>
-          </div>
+        <div className="flex items-center gap-1.5 text-neutral-600 text-xs">
+          <img
+            src="/assets/location.svg"
+            alt="location icon"
+            className="w-3 h-3"
+          />
+          <span className="truncate">{location}</span>
         </div>
 
-        {/* 이용시간(선택) */}
+        {/* 이용시간 */}
         {timeWindow && (
-          <div className="w-56 p-1 inline-flex justify-start items-center gap-1 overflow-hidden">
-            {/* 아이콘 */}
-            <div className="w-3 h-3 flex justify-center items-center overflow-hidden">
-              <img src="/assets/time.svg" alt="time icon" className="w-3 h-3" />
-            </div>
-            {/* 글자 */}
-            <div className="w-24 flex items-center overflow-hidden">
-              <div className="text-neutral-600 text-xs font-medium font-['Pretendard'] leading-5">
-                {timeWindow}
-              </div>
-            </div>
+          <div className="flex items-center gap-1.5 text-neutral-600 text-xs">
+            <img src="/assets/time.svg" alt="time icon" className="w-3 h-3" />
+            <span className="truncate">{timeWindow}</span>
           </div>
         )}
 
         {/* 포인트 */}
-        <div className="w-56 p-1 inline-flex justify-start items-center gap-1 overflow-hidden">
-          <div className="w-3 h-3 flex justify-center items-center overflow-hidden">
-            <img
-              src="/assets/point.svg"
-              alt="point icon"
-              className="w-3 h-3"
-            />{" "}
-          </div>
-          <div className="h-4 flex items-center overflow-hidden">
-            <div className="text-blue-500 text-xs font-semibold font-['Pretendard'] leading-none">
-              {formattedPoints}
-            </div>
-          </div>
+        <div className="flex items-center gap-1.5">
+          <img src="/assets/point.svg" alt="point icon" className="w-3 h-3" />
+          <span className="text-blue-600 text-xs font-semibold">
+            {formattedPoints}
+          </span>
         </div>
       </div>
     </div>

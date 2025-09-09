@@ -20,7 +20,7 @@ export default function MonitorPage() {
             </div>
 
             <ParkingSpaceCard
-              name="엘레강스빌"
+              name="엘레강스 빌"
               location="북문 근처"
               points={2500}
               timeWindow="09:00 ~ 11:00"
