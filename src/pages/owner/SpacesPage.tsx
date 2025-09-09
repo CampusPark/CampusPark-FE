@@ -10,7 +10,7 @@ export default function SpacesPage() {
       <div className="relative mx-auto min-h-svh w-full max-w-[420px] sm:max-w-[480px] md:max-w-[640px] flex flex-col items-stretch overflow-hidden">
         <div className="flex-1 bg-neutral-50 flex flex-col items-center gap-2">
           <Header title="내 공간 등록하기" />
-          <div className="w-full px-2 sm:px-4 py-1 flex flex-col justify-center items-start gap-3 overflow-hidden">
+          <div className="w-full px-3 py-1 flex flex-col justify-center items-start gap-3 overflow-hidden">
             {/* 진행바 */}
             <ProgressBar currentStep={1} />
 
