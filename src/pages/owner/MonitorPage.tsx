@@ -18,7 +18,7 @@ export default function MonitorPage() {
                 </div>
               </div>
             </div>
-
+            {/* 컴포넌트 사용 */}
             <ParkingSpaceCard
               name="엘레강스 빌"
               location="북문 근처"
