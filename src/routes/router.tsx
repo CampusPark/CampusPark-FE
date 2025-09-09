@@ -1,20 +1,25 @@
 import { Routes, Route } from "react-router-dom";
-// If the correct path is "@/routes/path", update as follows:
 import { ROUTE_PATH } from "@/routes/paths";
 
 import OnboardingPage from "@/pages/OnboardingPage";
 import MonitorPage from "@/pages/owner/MonitorPage";
+import HomePage from "@/pages/HomePage";
+// 추후 생성될 페이지 더미
+const ReservationsPage = () => <div>예약 내역 페이지</div>;
+const RegisterPage = () => <div>공간 등록 페이지</div>;
+const MyPage = () => <div>마이 페이지</div>;
 
-const Router = () => {
+export default function AppRouter() {
   return (
     <Routes>
-      {/* 온보딩 (앱 진입 시 첫 화면) */}
-      <Route path={ROUTE_PATH.MAIN} element={<MonitorPage />} />
-      {/* 사용자 영역 */}
 
-      {/* 오너 영역 */}
+      <Route path={ROUTE_PATH.ONBOARDING} element={<OnboardingPage />} />
+      <Route path={ROUTE_PATH.HOME} element={<HomePage />} />
+      <Route path={ROUTE_PATH.RESERVATIONS} element={<ReservationsPage />} />
+      <Route path={ROUTE_PATH.REGISTER} element={<RegisterPage />} />
+      <Route path={ROUTE_PATH.MYPAGE} element={<MyPage />} />
+      <Route path={ROUTE_PATH.MAIN} element={<MonitorPage />} />
+
     </Routes>
   );
-};
-
-export default Router;
+}
