@@ -16,18 +16,18 @@ export default function BottomNav() {
   return (
     <nav
       className="fixed bottom-0 left-0 right-0 z-50 mx-auto w-full max-w-[720px]
-                 border-t border-neutral-200 bg-white/95 backdrop-blur
-                 supports-[backdrop-filter]:bg-white/75 px-16 py-2
-                 pb-[calc(env(safe-area-inset-bottom,0)+0.5rem)]"
+             border-t border-neutral-200 bg-white/95 backdrop-blur
+             supports-[backdrop-filter]:bg-white/75 px-4 sm:px-8 md:px-16 py-2
+             pb-[calc(env(safe-area-inset-bottom,0)+0.5rem)]"
       aria-label="하단 네비게이션"
     >
-      <ul className="flex items-center justify-between">
+      <ul className="flex items-center justify-between gap-1">
         {items.map(({ label, path, icon: Icon }) => {
           const active = pathname.startsWith(path);
           return (
             <li
               key={path}
-              className="flex w-16 flex-col items-center justify-center"
+              className="flex flex-1 basis-1/5 min-w-[56px] flex-col items-center justify-center"
             >
               <button
                 type="button"
@@ -37,10 +37,10 @@ export default function BottomNav() {
                 aria-label={label}
               >
                 <Icon
-                  className={`h-6 w-6 ${active ? "text-blue-600" : "text-neutral-400"}`}
+                  className={`h-8 w-8 ${active ? "text-blue-600" : "text-neutral-400"}`}
                 />
                 <span
-                  className={`mt-0.5 text-[10px] font-bold leading-4 ${active ? "text-blue-600" : "text-neutral-400"}`}
+                  className={`mt-0.5 text-[13px] font-bold leading-4 ${active ? "text-blue-600" : "text-neutral-400"}`}
                 >
                   {label}
                 </span>
@@ -60,11 +60,15 @@ export function BottomNavSpacer() {
 
 /* ---- 간단 아이콘 ---- */
 function HomeIcon({ className = "" }) {
-  return <span className={`material-symbols-outlined ${className}`}>home</span>;
+  return (
+    <span className={`material-symbols-outlined text-[28px] ${className}`}>
+      home
+    </span>
+  );
 }
 function ListIcon({ className = "" }) {
   return (
-    <span className={`material-symbols-outlined ${className}`}>
+    <span className={`material-symbols-outlined text-[28px] ${className}`}>
       calendar_month
     </span>
   );
@@ -72,12 +76,14 @@ function ListIcon({ className = "" }) {
 
 function PlusIcon({ className = "" }) {
   return (
-    <span className={`material-symbols-outlined ${className}`}>add_circle</span>
+    <span className={`material-symbols-outlined text-[28px] ${className}`}>
+      add_circle
+    </span>
   );
 }
 function UserIcon({ className = "" }) {
   return (
-    <span className={`material-symbols-outlined ${className}`}>
+    <span className={`material-symbols-outlined text-[28px] ${className}`}>
       account_circle
     </span>
   );
