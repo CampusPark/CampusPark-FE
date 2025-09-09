@@ -1,4 +1,5 @@
 import BottomNav from "@/components/layout/BottomNav";
+import KakaoMap from "@/components/KakaoMap";
 
 type Spot = {
   id: string;
@@ -28,70 +29,64 @@ const dummySpots: Spot[] = [
 
 export default function HomePage() {
   return (
-    <div className="relative w-full min-h-dvh bg-zinc-50">
-      {/* 상단 지도(이미지) */}
-      <div className="relative flex h-[394px] w-full overflow-hidden rounded-t-lg">
-        <img
-          src="https://placehold.co/389x394"
-          alt="map"
-          className="h-full w-full object-cover"
-        />
-      </div>
+    <div className="relative min-h-dvh w-full bg-zinc-50 pb-24">
+      <KakaoMap />
+
       {/* 아래 패널 */}
-      <section className="relative -mt-2 w-full rounded-t-md bg-gray-100 p-2">
+      <section className="relative -mt-2 w-full rounded-t-md py-3">
         {/* 필터 카드 */}
-        <div className="mx-auto mb-3 w-full max-w-[389px] rounded-xl bg-white p-1 shadow-[0_0_8px_rgba(0,0,0,0.25)]">
-          {/* 시간/날짜 범위 - 스켈레톤 형태 */}
-          <div className="flex h-9 items-center justify-center gap-2">
-            <div className="flex w-[318px] items-center gap-2">
-              <div className="h-5 w-36 rounded bg-gray-200" />
+        <div className="w-full rounded-xl bg-white p-3 shadow-[0_0_8px_rgba(0,0,0,0.25)]">
+          {/* 시간 범위 */}
+          <div className="flex h-9 items-center justify-between gap-2">
+            <div className="flex flex-1 items-center gap-2">
+              <div className="h-5 flex-1 rounded bg-gray-200" />
               <span className="text-[10px] font-bold leading-4 text-black">
                 ~
               </span>
-              <div className="h-5 w-36 rounded bg-gray-200" />
+              <div className="h-5 flex-1 rounded bg-gray-200" />
             </div>
             <button
               type="button"
-              className="grid h-3.5 w-3.5 place-items-center rounded-[2px] bg-blue-500 p-1"
+              className="grid h-6 w-6 place-items-center rounded bg-blue-500"
               aria-label="검색"
             >
-              <svg width="8" height="8" viewBox="0 0 24 24" fill="white">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="white">
                 <path d="M21 20l-5.2-5.2a7 7 0 10-1.4 1.4L20 21l1-1zM4 10a6 6 0 1112 0A6 6 0 014 10z" />
               </svg>
             </button>
           </div>
 
           {/* 가격 범위 */}
-          <div className="px-1 py-2">
-            <div className="mb-1 flex items-center gap-1 px-1">
+          <div className="mt-3">
+            <div className="mb-1 px-1">
               <span className="text-[10px] font-semibold leading-4 text-black">
                 가격 범위
               </span>
             </div>
-            <div className="flex h-6 items-center gap-2">
-              <div className="h-5 w-[150px] rounded bg-gray-200" />
+            <div className="flex items-center gap-2">
+              <div className="h-5 flex-1 rounded bg-gray-200" />
               <span className="text-[10px] font-bold leading-4 text-black">
                 ~
               </span>
-              <div className="h-5 w-[150px] rounded bg-gray-200" />
+              <div className="h-5 flex-1 rounded bg-gray-200" />
             </div>
           </div>
         </div>
 
         {/* 섹션 타이틀 */}
-        <div className="mx-auto flex h-[22px] w-full max-w-[389px] items-center px-2.5">
-          <h2 className="text-[16px] font-bold leading-4 text-black">
-            근처 주차 공간
-          </h2>
-        </div>
+        <h2 className="mt-8 mb-4 text-[16px] font-bold leading-4 text-black">
+          근처 주차 공간
+        </h2>
 
         {/* 리스트 */}
-        <div className="mx-auto grid w-full max-w-[389px] gap-3 pb-28">
+        <div className="grid gap-3">
           {dummySpots.map((s) => (
             <SpotCard key={s.id} spot={s} />
           ))}
         </div>
       </section>
+
+      {/* 선택적: 스페이서 대신 컨테이너 pb-24로 처리 */}
       <BottomNav />
     </div>
   );
@@ -99,16 +94,17 @@ export default function HomePage() {
 
 function SpotCard({ spot }: { spot: Spot }) {
   return (
-    <div className="flex h-[90px] w-full items-center gap-2 rounded-lg bg-white p-1 shadow-[0_0_8px_rgba(0,0,0,0.25)]">
-      <div className="h-20 w-[98px] rounded-lg bg-orange-50" />
-      <div className="flex h-[74px] w-[240px] flex-col items-start justify-center gap-1 p-1">
-        <div>
-          <p className="text-[20px] font-bold leading-4 text-black">
-            {spot.name}
-          </p>
-        </div>
+    <div className="flex w-full items-center gap-3 rounded-2xl bg-white p-3 shadow-[0_0_8px_rgba(0,0,0,0.2)]">
+      {/* 썸네일 */}
+      <div className="h-16 w-20 flex-shrink-0 rounded-xl bg-orange-50" />
 
-        <div className="flex items-center gap-1">
+      {/* 본문 */}
+      <div className="flex min-w-0 flex-1 flex-col gap-1">
+        <p className="truncate text-[20px] font-bold leading-5 text-black">
+          {spot.name}
+        </p>
+
+        <div className="flex items-baseline gap-1">
           <span className="text-[15px] font-bold leading-4 text-blue-500">
             {spot.pricePoint}P
           </span>
@@ -117,8 +113,7 @@ function SpotCard({ spot }: { spot: Spot }) {
           </span>
         </div>
 
-        <div className="flex items-center gap-1 py-1 pr-1">
-          {/* 온도 아이콘 대체 */}
+        <div className="flex items-center gap-1 pt-1 text-[10px]">
           <svg
             width="12"
             height="12"
@@ -130,12 +125,8 @@ function SpotCard({ spot }: { spot: Spot }) {
               d="M13 15.1V5a1 1 0 10-2 0v10.1a3.5 3.5 0 102 0z"
             />
           </svg>
-          <span className="text-[10px] font-semibold leading-4 text-amber-500">
-            {spot.manner}
-          </span>
-          <span className="text-[10px] font-semibold leading-4 text-gray-500">
-            매너 온도
-          </span>
+          <span className="font-semibold text-amber-500">{spot.manner}</span>
+          <span className="font-semibold text-gray-500">매너 온도</span>
         </div>
       </div>
     </div>
