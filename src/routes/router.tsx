@@ -12,14 +12,12 @@ const MyPage = () => <div>마이 페이지</div>;
 export default function AppRouter() {
   return (
     <Routes>
-
       <Route path={ROUTE_PATH.ONBOARDING} element={<OnboardingPage />} />
       <Route path={ROUTE_PATH.HOME} element={<HomePage />} />
       <Route path={ROUTE_PATH.RESERVATIONS} element={<ReservationsPage />} />
       <Route path={ROUTE_PATH.REGISTER} element={<RegisterPage />} />
       <Route path={ROUTE_PATH.MYPAGE} element={<MyPage />} />
-      <Route path={ROUTE_PATH.MAIN} element={<MonitorPage />} />
-
+      <Route path={ROUTE_PATH.MONITOR} element={<MonitorPage />} />
     </Routes>
   );
 }
