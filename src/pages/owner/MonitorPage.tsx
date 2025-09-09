@@ -1,19 +1,14 @@
 import React from "react";
 import ParkingSpaceCard from "@/components/ParkingSpaceCard";
 import PrimaryButton from "@/components/PrimaryButton";
+import Header from "@/components/Header";
 
 export default function MonitorPage() {
   return (
     <div className="min-h-svh w-full bg-zinc-50">
       <div className="relative mx-auto min-h-svh w-full max-w-[420px] sm:max-w-[480px] md:max-w-[640px] flex flex-col items-stretch overflow-hidden">
         <div className="flex-1 bg-neutral-50 flex flex-col items-center gap-2">
-          <div className="w-full h-12 p-3 bg-white border-b border-zinc-300 inline-flex justify-between items-center">
-            <div className="w-6 h-6 relative" />
-            <div className="text-right justify-start text-black text-base sm:text-lg font-semibold leading-6 sm:leading-7">
-              내 공간 등록하기
-            </div>
-            <div className="w-6 h-6 relative" />
-          </div>
+          <Header title="내 공간 등록하기" />
 
           <div className="w-full px-3 sm:px-4 py-1 flex flex-col justify-center items-start gap-3 overflow-hidden">
             <div className="w-full inline-flex justify-start items-center gap-2.5 overflow-hidden">
