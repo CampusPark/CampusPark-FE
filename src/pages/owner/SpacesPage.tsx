@@ -10,7 +10,7 @@ export default function SpacesPage() {
       <div className="relative mx-auto min-h-svh w-full max-w-[420px] sm:max-w-[480px] md:max-w-[640px] flex flex-col items-stretch overflow-hidden">
         <div className="flex-1 bg-neutral-50 flex flex-col items-center gap-2">
           <Header title="내 공간 등록하기" />
-          <div className="w-full px-3 sm:px-4 py-1 flex flex-col justify-center items-start gap-3 overflow-hidden">
+          <div className="w-full px-2 sm:px-4 py-1 flex flex-col justify-center items-start gap-3 overflow-hidden">
             {/* 진행바 */}
             <ProgressBar currentStep={1} />
 
@@ -24,7 +24,7 @@ export default function SpacesPage() {
             </div>
 
             {/* 주소 입력 */}
-            <div className="w-full p-1 flex flex-col justify-center items-start gap-1 overflow-hidden">
+            <div className="w-full p-1 flex flex-col justify-center items-start gap-2 overflow-hidden">
               <div className="inline-flex justify-start items-center gap-2.5 overflow-hidden">
                 <div className="justify-center text-black text-xs font-medium font-['Pretendard'] leading-none">
                   주소
@@ -36,11 +36,11 @@ export default function SpacesPage() {
             {/* 지도 미리보기 (더미) */}
             <div className="w-full h-48 p-2.5 bg-neutral-200 rounded-lg flex flex-col justify-center items-center gap-2.5 overflow-hidden">
               <div className="flex flex-col justify-center items-center gap-2.5 overflow-hidden">
-                <div className="w-12 h-12 relative">
-                  <div className="w-6 h-8 left-[11.97px] top-[3px] absolute bg-neutral-600" />
-                  <div className="w-1.5 h-1.5 left-[21px] top-[10.5px] absolute bg-neutral-600" />
-                  <div className="w-10 h-7 left-[3px] top-[18px] absolute bg-neutral-600" />
-                </div>
+                <img
+                  src="/assets/map.svg"
+                  alt="map icon"
+                  className="w-12 h-12"
+                />
               </div>
               <div className="inline-flex justify-center items-center gap-2.5 overflow-hidden">
                 <div className="w-44 h-5 justify-center text-neutral-600 text-xs font-semibold font-['Pretendard'] leading-none">
