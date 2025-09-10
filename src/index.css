@@ -1,3 +1,15 @@
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
+
+html,
+body {
+  -ms-overflow-style: none; /* IE/Edge(구형) */
+  scrollbar-width: none; /* Firefox */
+}
+html::-webkit-scrollbar,
+body::-webkit-scrollbar {
+  width: 0 !important; /* Chrome/Safari/Edge(Chromium) */
+  height: 0 !important;
+  background: transparent;
+}
