@@ -4,7 +4,7 @@ import { ROUTE_PATH } from "@/routes/paths";
 const items = [
   { label: "홈", path: ROUTE_PATH.HOME, icon: HomeIcon },
   { label: "예약 내역", path: ROUTE_PATH.RESERVATIONS, icon: ListIcon },
-  { label: "공간 등록", path: ROUTE_PATH.REGISTER, icon: PlusIcon },
+  { label: "공간 등록", path: ROUTE_PATH.REGISTER_STEP1, icon: PlusIcon },
   { label: "마이 페이지", path: ROUTE_PATH.MYPAGE, icon: UserIcon },
 ];
 
