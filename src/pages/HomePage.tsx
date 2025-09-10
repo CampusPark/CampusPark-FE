@@ -2,6 +2,8 @@ import BottomNav from "@/components/layout/BottomNav";
 import KakaoMap from "@/components/KakaoMap";
 import SearchTrigger from "@/components/SearchTrigger";
 import { useNavigate } from "react-router-dom";
+import { useAiQuickBooking } from "@/ai/useAiQuickBooking";
+import ListeningPing from "@/ai/ListeningPing";
 
 type Spot = {
   id: string;
@@ -31,6 +33,12 @@ const dummySpots: Spot[] = [
 
 export default function HomePage() {
   const nav = useNavigate();
+  const { run, phase, interim, error } = useAiQuickBooking();
+  const listening =
+    phase === "LISTEN_DEST" ||
+    phase === "LISTEN_PICK" ||
+    phase === "LISTEN_SLOT";
+
   return (
     <div className="relative min-h-dvh w-full bg-zinc-50 pb-24">
       <div className="relative">
@@ -49,10 +57,23 @@ export default function HomePage() {
         <div className="pointer-events-none absolute right-2 bottom-5 z-20">
           <button
             type="button"
+            onClick={() => run()}
             className="pointer-events-auto rounded-full bg-white/95 px-3 py-1 text-sm font-semibold shadow-md"
           >
             AI 추천
           </button>
+          {/* 상태 디버그 */}
+          <div className="pointer-events-auto rounded-full bg-black/60 px-2 py-1 text-[11px] text-white">
+            {phase}
+            {interim && ` · ${interim}`}
+          </div>
+          <ListeningPing show={listening} />
+
+          {error && (
+            <div className="fixed bottom-20 left-1/2 z-50 -translate-x-1/2 rounded-md bg-black/80 px-3 py-2 text-xs text-white">
+              {error}
+            </div>
+          )}
         </div>
       </div>
 
