@@ -1,5 +1,7 @@
 import BottomNav from "@/components/layout/BottomNav";
 import KakaoMap from "@/components/KakaoMap";
+import SearchTrigger from "@/components/SearchTrigger";
+import { useNavigate } from "react-router-dom";
 
 type Spot = {
   id: string;
@@ -28,9 +30,31 @@ const dummySpots: Spot[] = [
 ];
 
 export default function HomePage() {
+  const nav = useNavigate();
   return (
     <div className="relative min-h-dvh w-full bg-zinc-50 pb-24">
-      <KakaoMap />
+      <div className="relative">
+        {/* 지도 자체는 z-10 */}
+        <KakaoMap />
+
+        {/* 지도 위 오버레이 영역 (드래그 가능하도록 래퍼는 pointer-events-none) */}
+        <div className="pointer-events-none absolute inset-x-0 top-5 z-20 flex justify-center px-4">
+          {/* 실제 버튼만 클릭 가능하도록 pointer-events-auto */}
+          <SearchTrigger
+            onClick={() => nav("/search")}
+            className="pointer-events-auto w-5/6"
+          />
+        </div>
+
+        <div className="pointer-events-none absolute right-2 bottom-5 z-20">
+          <button
+            type="button"
+            className="pointer-events-auto rounded-full bg-white/95 px-3 py-1 text-sm font-semibold shadow-md"
+          >
+            AI 추천
+          </button>
+        </div>
+      </div>
 
       {/* 아래 패널 */}
       <section className="relative -mt-2 w-full rounded-t-md py-3">
