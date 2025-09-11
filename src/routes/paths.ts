@@ -5,7 +5,7 @@ export const ROUTE_PATH = {
   SEARCH: "/search", // 검색
   SEARCH_DETAIL: "/search/:id",
 
-  RESERVATIONS: "/reservatio<<<<<<< feat/14-SpacesPage
+  RESERVATIONS: "/reservation",
   REGISTER: "/register", // 등록 루트 (리다이렉트 용)
   REGISTER_STEP1: "/register/step-1",
   REGISTER_STEP2: "/register/step-2",
@@ -15,5 +15,4 @@ export const ROUTE_PATH = {
 
   MYPAGE: "/mypage",
   MONITOR: "/owner/monitor",
-
 };

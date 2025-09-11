@@ -39,7 +39,7 @@ export default function SpacesPageStep3() {
                 </div>
 
                 <div className="w-full px-1 inline-flex justify-start items-center gap-2.5">
-                  <div className="w-full h-8 bg-neutral-300 rounded border border-neutral-400" />
+                  <div className="w-full h-8 bg-neutral-200 rounded border border-neutral-400" />
 
                   <div className="shrink-0 px-1 flex items-center">
                     <span className="text-black text-base font-semibold leading-none">
@@ -47,7 +47,7 @@ export default function SpacesPageStep3() {
                     </span>
                   </div>
 
-                  <div className="w-full h-8 bg-neutral-300 rounded border border-neutral-400" />
+                  <div className="w-full h-8 bg-neutral-200 rounded border border-neutral-400" />
                 </div>
               </div>
             </div>
