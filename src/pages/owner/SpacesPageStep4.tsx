@@ -7,11 +7,12 @@ import PrimaryButton from "@/components/PrimaryButton";
 import SecondaryButton from "@/components/SecondaryButton";
 import { ROUTE_PATH } from "@/routes/paths";
 
+
 // 세션 스토리지 키 (페이지 간 임시 저장용)
 // 백엔드와 단계별 즉시 저장한다면 sessionStorage는 제거해도 됩니다.
 const STORAGE_KEY = "register.totalSpaces";
 
-export default function SpacesPageStep3() {
+export default function SpacesPageStep4() {
   const navigate = useNavigate();
 
   // 초기값: 세션스토리지 → 기본값 1
