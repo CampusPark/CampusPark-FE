@@ -7,7 +7,7 @@ import PrimaryButton from "@/components/PrimaryButton";
 import SecondaryButton from "@/components/SecondaryButton";
 import { ROUTE_PATH } from "@/routes/paths";
 
-export default function SpacesPageStep4() {
+export default function SpacesPageStep5() {
   const navigate = useNavigate();
   const [price, setPrice] = useState<number | "">("");
 
@@ -23,7 +23,7 @@ export default function SpacesPageStep4() {
 
           <div className="w-full px-3 py-1 flex flex-col justify-center items-start gap-3 overflow-hidden">
             {/* 진행바 */}
-            <ProgressBar currentStep={4} />
+            <ProgressBar currentStep={5} />
 
             {/* 안내 문구 */}
             <div className="w-full p-1 flex flex-col justify-center items-start gap-2 overflow-hidden">
