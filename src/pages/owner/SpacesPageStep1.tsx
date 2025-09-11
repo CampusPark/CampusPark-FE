@@ -1,10 +1,14 @@
 import React from "react";
+import { useNavigate } from "react-router-dom";
 import Header from "@/components/Header";
 import BottomNav from "@/components/layout/BottomNav";
 import ProgressBar from "@/components/ProgressBar";
 import PrimaryButton from "@/components/PrimaryButton";
+import { ROUTE_PATH } from "@/routes/paths";
 
-export default function SpacesPage() {
+export default function SpacesPageStep1() {
+  const navigate = useNavigate();
+
   return (
     <div className="min-h-svh w-full bg-zinc-50">
       <div className="relative mx-auto min-h-svh w-full max-w-[420px] sm:max-w-[480px] md:max-w-[640px] flex flex-col items-stretch overflow-hidden">
@@ -51,7 +55,9 @@ export default function SpacesPage() {
 
             {/* 다음 버튼 */}
             <div className="p-1 w-full inline-flex justify-center items-center gap-2.5 overflow-hidden">
-              <PrimaryButton onClick={() => console.log("다음 버튼 클릭!")}>
+              <PrimaryButton
+                onClick={() => navigate(ROUTE_PATH.REGISTER_STEP2)}
+              >
                 다음
               </PrimaryButton>
             </div>

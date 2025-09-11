@@ -1,14 +1,19 @@
+// routes/paths.ts
 export const ROUTE_PATH = {
   ONBOARDING: "/", // 시작 화면
   HOME: "/home", // 지도/메인 페이지
   SEARCH: "/search", // 검색
   SEARCH_DETAIL: "/search/:id",
 
-  RESERVATIONS: "/reservations", // 예약 내역
+  RESERVATIONS: "/reservatio<<<<<<< feat/14-SpacesPage
+  REGISTER: "/register", // 등록 루트 (리다이렉트 용)
+  REGISTER_STEP1: "/register/step-1",
+  REGISTER_STEP2: "/register/step-2",
+  REGISTER_STEP3: "/register/step-3",
+  REGISTER_STEP4: "/register/step-4",
+  REGISTER_STEP5: "/register/step-5",
 
-  REGISTER: "/register", // 공간 등록
+  MYPAGE: "/mypage",
+  MONITOR: "/owner/monitor",
 
-  REGISTER: "/owner/SpacesPage", // 공간 등록
-  MYPAGE: "/mypage", // 마이 페이지
-  MONITOR: "/owner/monitor", // 모니터링 페이지
 };

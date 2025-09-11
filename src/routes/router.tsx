@@ -1,14 +1,18 @@
-import { Routes, Route } from "react-router-dom";
+import { Routes, Route, Navigate } from "react-router-dom";
 import { ROUTE_PATH } from "@/routes/paths";
 
 import OnboardingPage from "@/pages/OnboardingPage";
 import MonitorPage from "@/pages/owner/MonitorPage";
-import SpacesPage from "@/pages/owner/SpacesPage";
+import SpacesPageStep1 from "@/pages/owner/SpacesPageStep1";
+import SpacesPageStep2 from "@/pages/owner/SpacesPageStep2";
+import SpacesPageStep3 from "@/pages/owner/SpacesPageStep3";
+import SpacesPageStep4 from "@/pages/owner/SpacesPageStep4";
+import SpacesPageStep5 from "@/pages/owner/SpacesPageStep5";
 import HomePage from "@/pages/HomePage";
 import SearchPage from "@/pages/search/SearchPage";
 import SearchDetailPage from "@/pages/search/SearchDetailPage";
 
-// 추후 생성될 페이지 더미
+
 const ReservationsPage = () => <div>예약 내역 페이지</div>;
 const MyPage = () => <div>마이 페이지</div>;
 
@@ -21,9 +25,23 @@ export default function AppRouter() {
       <Route path={ROUTE_PATH.SEARCH_DETAIL} element={<SearchDetailPage />} />
 
       <Route path={ROUTE_PATH.RESERVATIONS} element={<ReservationsPage />} />
-      <Route path={ROUTE_PATH.REGISTER} element={<SpacesPage />} />
+
+      {/* /register로 들어오면 step-1로 안내 */}
+      <Route
+        path={ROUTE_PATH.REGISTER}
+        element={<Navigate to={ROUTE_PATH.REGISTER_STEP1} replace />}
+      />
+      <Route path={ROUTE_PATH.REGISTER_STEP1} element={<SpacesPageStep1 />} />
+      <Route path={ROUTE_PATH.REGISTER_STEP2} element={<SpacesPageStep2 />} />
+      <Route path={ROUTE_PATH.REGISTER_STEP3} element={<SpacesPageStep3 />} />
+      <Route path={ROUTE_PATH.REGISTER_STEP4} element={<SpacesPageStep4 />} />
+      <Route path={ROUTE_PATH.REGISTER_STEP5} element={<SpacesPageStep5 />} />
+
       <Route path={ROUTE_PATH.MYPAGE} element={<MyPage />} />
       <Route path={ROUTE_PATH.MONITOR} element={<MonitorPage />} />
+
+      {/* (선택) 없는 경로 404 처리 */}
+      {/* <Route path="*" element={<Navigate to={ROUTE_PATH.ONBOARDING} replace />} /> */}
     </Routes>
   );
 }
