@@ -3,7 +3,6 @@ import { useState } from "react";
 import { ROUTE_PATH } from "@/routes/paths";
 import VoiceMicSheet from "@/ai/VoiceMicSheet"; // 경로는 프로젝트에 맞게
 
-/** 하단 네비게이션: 가운데 마이크 버튼(음성인식) 포함 */
 export default function BottomNav() {
   const { pathname } = useLocation();
   const nav = useNavigate();
