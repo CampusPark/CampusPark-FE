@@ -3,8 +3,7 @@ export const ROUTE_PATH = {
   ONBOARDING: "/", // 시작 화면
   HOME: "/home", // 지도/메인 페이지
   SEARCH: "/search", // 검색
-  SEARCH_DETAIL: "/search/:id",
-
+  SPOT_DETAIL: "/spots/:id",
 
   RESERVATIONS: "/reservations", // 예약 내역
   REGISTER: "/register", // 등록 루트 (리다이렉트 용)
@@ -13,7 +12,7 @@ export const ROUTE_PATH = {
   REGISTER_STEP3: "/register/step-3",
   REGISTER_STEP4: "/register/step-4",
   REGISTER_STEP5: "/register/step-5",
-  
+
   MYPAGE: "/mypage",
   MONITOR: "/owner/monitor",
 };
