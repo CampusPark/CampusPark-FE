@@ -1,7 +1,8 @@
 import BottomNav from "@/components/layout/BottomNav";
 import KakaoMap from "@/components/KakaoMap";
 import SearchTrigger from "@/components/SearchTrigger";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, Link, generatePath } from "react-router-dom";
+import { ROUTE_PATH } from "@/routes/paths";
 
 type Spot = {
   id: string;
@@ -70,18 +71,22 @@ export default function HomePage() {
 }
 
 function SpotCard({ spot }: { spot: Spot }) {
+  const to = generatePath(ROUTE_PATH.SPOT_DETAIL, { id: spot.id });
   return (
-    <div className="flex w-full items-center gap-3 rounded-2xl bg-white p-3 shadow-[0_0_8px_rgba(0,0,0,0.2)]">
-      {/* 썸네일 */}
-      <div className="h-16 w-20 flex-shrink-0 rounded-xl bg-orange-50" />
-
-      {/* 본문 */}
-      <div className="flex min-w-0 flex-1 flex-col gap-1">
-        <p className="truncate text-[20px] font-bold leading-5 text-black">
+    <Link
+      to={to}
+      className="flex h-[90px] w-full items-center gap-2 rounded-lg bg-white p-1 shadow-[0_0_8px_rgba(0,0,0,0.25)]
+                 hover:shadow-[0_2px_12px_rgba(0,0,0,0.18)] transition-shadow
+                 focus:outline-none focus:ring-2 focus:ring-blue-500"
+      aria-label={`${spot.name} 상세로 이동`}
+    >
+      <div className="h-20 w-[98px] rounded-lg bg-orange-50" />
+      <div className="flex h-[74px] flex-col items-start justify-center gap-1 p-1">
+        <p className="text-[20px] font-bold leading-4 text-black">
           {spot.name}
         </p>
 
-        <div className="flex items-baseline gap-1">
+        <div className="flex items-center gap-1">
           <span className="text-[15px] font-bold leading-4 text-blue-500">
             {spot.pricePoint}P
           </span>
@@ -90,7 +95,7 @@ function SpotCard({ spot }: { spot: Spot }) {
           </span>
         </div>
 
-        <div className="flex items-center gap-1 pt-1 text-[10px]">
+        <div className="flex items-center gap-1 py-1 pr-1">
           <svg
             width="12"
             height="12"
@@ -102,10 +107,14 @@ function SpotCard({ spot }: { spot: Spot }) {
               d="M13 15.1V5a1 1 0 10-2 0v10.1a3.5 3.5 0 102 0z"
             />
           </svg>
-          <span className="font-semibold text-amber-500">{spot.manner}</span>
-          <span className="font-semibold text-gray-500">매너 온도</span>
+          <span className="text-[10px] font-semibold leading-4 text-amber-500">
+            {spot.manner}
+          </span>
+          <span className="text-[10px] font-semibold leading-4 text-gray-500">
+            매너 온도
+          </span>
         </div>
       </div>
-    </div>
+    </Link>
   );
 }
