@@ -1,4 +1,4 @@
-import React, { useRef, useState } from "react";
+import React, { useRef, useState, useMemo } from "react";
 import { useNavigate } from "react-router-dom";
 import Header from "@/components/Header";
 import BottomNav from "@/components/layout/BottomNav";
@@ -7,11 +7,18 @@ import PrimaryButton from "@/components/PrimaryButton";
 import SecondaryButton from "@/components/SecondaryButton";
 import { ROUTE_PATH } from "@/routes/paths";
 
+type UploadResponse = { urls: string[] };
+
 export default function SpacesPageStep2() {
   const navigate = useNavigate();
 
-  // 간단 업로드 상태 (4칸)
+  // 4칸 고정 업로드 슬롯
+  // 상태 관리
+  // 업로드 칸에 들어간 파일 상태, 업로드 진행중 여부
   const [files, setFiles] = useState<(File | null)[]>([null, null, null, null]);
+  const [isUploading, setIsUploading] = useState(false);
+
+  // 파일 선택 & 입력 요소
   const inputs = [
     useRef<HTMLInputElement>(null),
     useRef<HTMLInputElement>(null),
@@ -19,15 +26,91 @@ export default function SpacesPageStep2() {
     useRef<HTMLInputElement>(null),
   ];
 
+  // 썸네일 미리보기
+  const previews = useMemo(
+    () => files.map((f) => (f ? URL.createObjectURL(f) : null)),
+    [files]
+  );
+
+  // 버튼을 클릭하면 input[type="file"] 요소를 클릭
   const onPick = (idx: number) => inputs[idx].current?.click();
+
   const onChange = (idx: number, e: React.ChangeEvent<HTMLInputElement>) => {
     const f = e.target.files?.[0] ?? null;
+    if (!f) return;
+
+    // 간단 검증 (이미지 + 최대 10MB)
+    if (!f.type.startsWith("image/")) {
+      alert("이미지 파일만 업로드할 수 있어요.");
+      return;
+    }
+    if (f.size > 10 * 1024 * 1024) {
+      alert("파일 용량은 최대 10MB까지 가능합니다.");
+      return;
+    }
+
     setFiles((prev) => {
       const next = [...prev];
       next[idx] = f;
       return next;
     });
+    // 같은 파일 다시 선택 시 onChange가 안 먹을 수 있어서 값 리셋
+    e.currentTarget.value = "";
   };
+
+  const onRemove = (idx: number) => {
+    setFiles((prev) => {
+      const next = [...prev];
+      next[idx] = null;
+      return next;
+    });
+  };
+
+  // 실제 업로드 함수(백엔드 엔드포인트에 맞게 수정하세요)
+  const uploadImages = async (selected: File[]): Promise<UploadResponse> => {
+    // 백엔드 준비 전 임시 저장(프론트만) 버전 —— sessionStorage
+    // 실제 서버 업로드가 가능하면 아래 FormData 방식으로 교체:
+    //
+    // const form = new FormData();
+    // selected.forEach((f, i) => form.append("images", f, f.name ?? `image-${i}.jpg`));
+    // const res = await fetch("/api/parking-spaces/images", { method: "POST", body: form });
+    // if (!res.ok) throw new Error("업로드 실패");
+    // return (await res.json()) as UploadResponse;
+
+    const objectUrls = selected.map((f) => URL.createObjectURL(f));
+    // 임시로 URL 목록을 sessionStorage에 저장 (실서비스에서는 서버가 반환한 URL 사용)
+    sessionStorage.setItem(
+      "register.step2.imageObjectUrls",
+      JSON.stringify(objectUrls)
+    );
+    return { urls: objectUrls };
+  };
+
+  const onNext = async () => {
+    const selected = files.filter((f): f is File => !!f);
+    if (selected.length === 0) {
+      alert("최소 1장의 사진을 업로드해주세요.");
+      return;
+    }
+    try {
+      setIsUploading(true);
+      const { urls } = await uploadImages(selected);
+
+      // 다음 단계에서 쓸 수 있도록 저장(실서비스라면 서버에서 받은 고정 URL/키를 저장)
+      sessionStorage.setItem(
+        "register.step2.uploadedUrls",
+        JSON.stringify(urls)
+      );
+
+      navigate(ROUTE_PATH.REGISTER_STEP3);
+    } catch (e) {
+      console.error(e);
+      alert("이미지 업로드에 실패했어요. 잠시 후 다시 시도해주세요.");
+    } finally {
+      setIsUploading(false);
+    }
+  };
+
   return (
     <div className="min-h-svh w-full bg-zinc-50">
       <div className="relative mx-auto min-h-svh w-full max-w-[420px] sm:max-w-[480px] md:max-w-[640px] flex flex-col items-stretch overflow-hidden">
@@ -40,7 +123,7 @@ export default function SpacesPageStep2() {
             {/* 안내 문구 */}
             <div className="w-full p-1 inline-flex justify-start items-center gap-2.5 overflow-hidden">
               <div className="flex justify-start items-center gap-2.5 overflow-hidden">
-                <div className="justify-center text-black text-base font-bold font-['Pretendard'] leading-7">
+                <div className="justify-center text-black text-base font-bold leading-7">
                   주차 공간 사진을 업로드 해주세요
                 </div>
               </div>
@@ -52,21 +135,33 @@ export default function SpacesPageStep2() {
                 {files.map((f, idx) => (
                   <div
                     key={idx}
-                    className="h-32 bg-neutral-200 rounded-lg outline outline-1 outline-neutral-400 flex flex-col items-center justify-center gap-2"
+                    className="h-32 bg-neutral-200 rounded-lg outline outline-1 outline-neutral-400 flex flex-col items-center justify-center gap-2 relative overflow-hidden"
                   >
-                    {f ? (
-                      <div className="flex flex-col items-center gap-1">
-                        <div className="text-neutral-700 text-[10px] font-semibold">
-                          {f.name}
-                        </div>
-                        <button
-                          type="button"
+                    {previews[idx] ? (
+                      <>
+                        <img
+                          src={previews[idx] as string}
+                          alt={`preview-${idx}`}
+                          className="absolute inset-0 w-full h-full object-cover"
                           onClick={() => onPick(idx)}
-                          className="px-2 py-1 text-[11px] rounded border border-neutral-400 bg-white"
-                        >
-                          다른 사진 선택
-                        </button>
-                      </div>
+                        />
+                        <div className="absolute bottom-1 left-1 right-1 flex gap-2">
+                          <button
+                            type="button"
+                            onClick={() => onPick(idx)}
+                            className="flex-1 px-2 py-1 text-[11px] rounded bg-white border border-blue-700"
+                          >
+                            교체
+                          </button>
+                          <button
+                            type="button"
+                            onClick={() => onRemove(idx)}
+                            className="flex-1 px-2 py-1 text-[11px] text-white rounded bg-blue-500 border border-blue-700"
+                          >
+                            삭제
+                          </button>
+                        </div>
+                      </>
                     ) : (
                       <button
                         type="button"
@@ -96,27 +191,12 @@ export default function SpacesPageStep2() {
             </div>
 
             {/* 버튼 */}
-            {/* <div className="flex gap-3 w-full px-3">
-              <PrimaryButton
-                onClick={() => navigate(ROUTE_PATH.REGISTER_STEP1)}
-                className="flex-1"
-              >
-                이전
-              </PrimaryButton>
-              <PrimaryButton
-                onClick={() => navigate(ROUTE_PATH.REGISTER_STEP3)}
-                className="flex-1"
-              >
-                다음
-              </PrimaryButton>
-            </div>
-          </div> */}
-
             <div className="w-full px-3 pb-2 flex items-center gap-3">
               <SecondaryButton
                 fullWidth={false}
                 className="flex-1"
                 onClick={() => navigate(ROUTE_PATH.REGISTER_STEP1)}
+                disabled={isUploading}
               >
                 이전
               </SecondaryButton>
@@ -124,9 +204,10 @@ export default function SpacesPageStep2() {
               <PrimaryButton
                 fullWidth={false}
                 className="flex-1"
-                onClick={() => navigate(ROUTE_PATH.REGISTER_STEP3)}
+                onClick={onNext}
+                disabled={isUploading}
               >
-                다음
+                {isUploading ? "업로드 중..." : "다음"}
               </PrimaryButton>
             </div>
 

@@ -114,7 +114,7 @@ export default function SpacesPageStep1() {
             </div>
 
             {/* 다음 버튼: sticky로 하단 고정 (스크롤 상단에 붙음) */}
-            <div className="w-full sticky bottom-[calc(72px+env(safe-area-inset-bottom))] bg-neutral-50/95 backdrop-blur supports-[backdrop-filter]:bg-neutral-50/80 pt-2">
+            <div className="w-full sticky pb-6 bottom-[calc(72px+env(safe-area-inset-bottom))] bg-neutral-50/95 backdrop-blur supports-[backdrop-filter]:bg-neutral-50/80 pt-2">
               <PrimaryButton
                 onClick={() => navigate(ROUTE_PATH.REGISTER_STEP2)}
               >
