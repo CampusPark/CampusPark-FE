@@ -7,7 +7,7 @@ import PrimaryButton from "@/components/PrimaryButton";
 import SecondaryButton from "@/components/SecondaryButton";
 import { ROUTE_PATH } from "@/routes/paths";
 
-export default function SpacesPageStep3() {
+export default function SpacesPageStep4() {
   const navigate = useNavigate();
   return (
     <div className="min-h-svh w-full bg-zinc-50">
