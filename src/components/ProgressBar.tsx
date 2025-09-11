@@ -9,7 +9,7 @@ type ProgressBarProps = {
 
 export default function ProgressBar({
   currentStep,
-  totalSteps = 4,
+  totalSteps = 5,
 }: ProgressBarProps) {
   const progressPercentage = Math.min((currentStep / totalSteps) * 100, 100);
 

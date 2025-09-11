@@ -7,6 +7,7 @@ import SpacesPageStep1 from "@/pages/owner/SpacesPageStep1";
 import SpacesPageStep2 from "@/pages/owner/SpacesPageStep2";
 import SpacesPageStep3 from "@/pages/owner/SpacesPageStep3";
 import SpacesPageStep4 from "@/pages/owner/SpacesPageStep4";
+import SpacesPageStep5 from "@/pages/owner/SpacesPageStep5";
 import HomePage from "@/pages/HomePage";
 
 const ReservationsPage = () => <div>예약 내역 페이지</div>;
@@ -28,6 +29,7 @@ export default function AppRouter() {
       <Route path={ROUTE_PATH.REGISTER_STEP2} element={<SpacesPageStep2 />} />
       <Route path={ROUTE_PATH.REGISTER_STEP3} element={<SpacesPageStep3 />} />
       <Route path={ROUTE_PATH.REGISTER_STEP4} element={<SpacesPageStep4 />} />
+      <Route path={ROUTE_PATH.REGISTER_STEP5} element={<SpacesPageStep5 />} />
 
       <Route path={ROUTE_PATH.MYPAGE} element={<MyPage />} />
       <Route path={ROUTE_PATH.MONITOR} element={<MonitorPage />} />

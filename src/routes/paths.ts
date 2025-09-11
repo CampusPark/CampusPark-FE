@@ -8,6 +8,8 @@ export const ROUTE_PATH = {
   REGISTER_STEP2: "/register/step-2",
   REGISTER_STEP3: "/register/step-3",
   REGISTER_STEP4: "/register/step-4",
+  REGISTER_STEP5: "/register/step-5",
+
   MYPAGE: "/mypage",
   MONITOR: "/owner/monitor",
 };
