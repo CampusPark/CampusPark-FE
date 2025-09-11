@@ -2,7 +2,10 @@
 export const ROUTE_PATH = {
   ONBOARDING: "/", // 시작 화면
   HOME: "/home", // 지도/메인 페이지
-  RESERVATIONS: "/reservations", // 예약 내역
+  SEARCH: "/search", // 검색
+  SEARCH_DETAIL: "/search/:id",
+
+  RESERVATIONS: "/reservatio<<<<<<< feat/14-SpacesPage
   REGISTER: "/register", // 등록 루트 (리다이렉트 용)
   REGISTER_STEP1: "/register/step-1",
   REGISTER_STEP2: "/register/step-2",
@@ -12,4 +15,5 @@ export const ROUTE_PATH = {
 
   MYPAGE: "/mypage",
   MONITOR: "/owner/monitor",
+
 };
