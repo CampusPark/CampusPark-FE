@@ -78,9 +78,8 @@ export default function SearchPage() {
     }
   };
 
-  const goDetail = (id: string | number) => {
-    const path = generatePath(ROUTE_PATH.SEARCH_DETAIL, { id: String(id) });
-    navigate(path);
+  const goDetail = (id: string) => {
+    navigate(generatePath(ROUTE_PATH.SPOT_DETAIL, { id }));
   };
 
   return (
@@ -113,7 +112,10 @@ export default function SearchPage() {
         )}
 
       {!loading && !error && items.length > 0 && (
-        <SearchResults results={items} onSelect={(s) => goDetail(s.id)} />
+        <SearchResults
+          results={items}
+          onSelect={(s) => goDetail(String(s.id))}
+        />
       )}
     </div>
   );
