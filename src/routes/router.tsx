@@ -11,9 +11,9 @@ import SpacesPageStep5 from "@/pages/owner/SpacesPageStep5";
 import HomePage from "@/pages/HomePage";
 import SearchPage from "@/pages/search/SearchPage";
 import SpotDetailPage from "@/pages/SpotDetailPage";
+import MyPage from "@/pages/MyPage";
 
 const ReservationsPage = () => <div>예약 내역 페이지</div>;
-const MyPage = () => <div>마이 페이지</div>;
 
 export default function AppRouter() {
   return (
@@ -36,8 +36,9 @@ export default function AppRouter() {
       <Route path={ROUTE_PATH.REGISTER_STEP4} element={<SpacesPageStep4 />} />
       <Route path={ROUTE_PATH.REGISTER_STEP5} element={<SpacesPageStep5 />} />
 
-      <Route path={ROUTE_PATH.MYPAGE} element={<MyPage />} />
       <Route path={ROUTE_PATH.MONITOR} element={<MonitorPage />} />
+
+      <Route path={ROUTE_PATH.MYPAGE} element={<MyPage />} />
 
       {/* (선택) 없는 경로 404 처리 */}
       {/* <Route path="*" element={<Navigate to={ROUTE_PATH.ONBOARDING} replace />} /> */}
