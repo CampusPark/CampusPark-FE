@@ -11,6 +11,7 @@ type LocalSubmission = {
   createdAt: string;
   payload: {
     address: string;
+    name?: string; // Step1 저장값 (없으면 카드에서 기본값 사용)
     latitude: number;
     longitude: number;
     availableStartTime: string; // "YYYY-MM-DDTHH:00:00"
