@@ -12,6 +12,7 @@ import HomePage from "@/pages/HomePage";
 import SearchPage from "@/pages/search/SearchPage";
 import SpotDetailPage from "@/pages/SpotDetailPage";
 import MyPage from "@/pages/MyPage";
+import SpotBookingPage from "@/pages/SpotBookingPage";
 
 const ReservationsPage = () => <div>예약 내역 페이지</div>;
 
@@ -22,6 +23,7 @@ export default function AppRouter() {
       <Route path={ROUTE_PATH.HOME} element={<HomePage />} />
       <Route path={ROUTE_PATH.SEARCH} element={<SearchPage />} />
       <Route path={ROUTE_PATH.SPOT_DETAIL} element={<SpotDetailPage />} />
+      <Route path={ROUTE_PATH.SPOT_BOOKING} element={<SpotBookingPage />} />
 
       <Route path={ROUTE_PATH.RESERVATIONS} element={<ReservationsPage />} />
 

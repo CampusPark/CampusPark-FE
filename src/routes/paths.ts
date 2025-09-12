@@ -4,6 +4,7 @@ export const ROUTE_PATH = {
   HOME: "/home", // 지도/메인 페이지
   SEARCH: "/search", // 검색
   SPOT_DETAIL: "/spots/:id",
+  SPOT_BOOKING: "/spots/booking", // 예약 (id는 state로 전달)
 
   RESERVATIONS: "/reservations", // 예약 내역
   REGISTER: "/register", // 등록 루트 (리다이렉트 용)
