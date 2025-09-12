@@ -106,109 +106,105 @@ export default function SpacesPageStep2() {
   };
 
   return (
-    <div className="min-h-svh w-full bg-zinc-50">
-      <div className="relative mx-auto min-h-svh w-full max-w-[420px] sm:max-w-[480px] md:max-w-[640px] flex flex-col items-stretch overflow-hidden">
-        <div className="flex-1 bg-neutral-50 flex flex-col items-center gap-2">
-          <Header title="내 공간 등록하기" />
-          <div className="w-full px-3 py-1 flex flex-col justify-center items-start gap-3 overflow-hidden">
-            {/* 진행바 */}
-            <ProgressBar currentStep={2} />
+    <div className="flex-1 flex flex-col items-stretch bg-neutral-50">
+      <Header title="내 공간 등록하기" />
+      <div className="w-full px-4 py-1 flex flex-col justify-center items-start gap-3 overflow-hidden">
+        {/* 진행바 */}
+        <ProgressBar currentStep={2} />
 
-            {/* 안내 문구 */}
-            <div className="w-full p-1 inline-flex justify-start items-center gap-2.5 overflow-hidden">
-              <div className="flex justify-start items-center gap-2.5 overflow-hidden">
-                <div className="justify-center text-black text-base font-bold leading-7">
-                  주차 공간 사진을 업로드 해주세요
-                </div>
-              </div>
+        {/* 안내 문구 */}
+        <div className="w-full p-1 inline-flex justify-start items-center gap-2.5 overflow-hidden">
+          <div className="flex justify-start items-center gap-2.5 overflow-hidden">
+            <div className="justify-center text-black text-base font-bold leading-7">
+              주차 공간 사진을 업로드 해주세요
             </div>
+          </div>
+        </div>
 
-            {/* 업로드 그리드 */}
-            <div className="w-full px-3">
-              <div className="grid grid-cols-2 gap-3">
-                {files.map((_, idx) => (
-                  <div
-                    key={idx}
-                    className="h-32 bg-neutral-200 rounded-lg outline outline-1 outline-neutral-400 flex flex-col items-center justify-center gap-2 relative overflow-hidden"
-                  >
-                    {previews[idx] ? (
-                      <>
-                        <img
-                          src={previews[idx] as string}
-                          alt={`preview-${idx}`}
-                          className="absolute inset-0 w-full h-full object-cover"
-                          onClick={() => onPick(idx)}
-                        />
-                        <div className="absolute bottom-1 left-1 right-1 flex gap-2">
-                          <button
-                            type="button"
-                            onClick={() => onPick(idx)}
-                            className="flex-1 px-2 py-1 text-[11px] rounded bg-white border border-blue-700"
-                          >
-                            교체
-                          </button>
-                          <button
-                            type="button"
-                            onClick={() => onRemove(idx)}
-                            className="flex-1 px-2 py-1 text-[11px] text-white rounded bg-blue-500 border border-blue-700"
-                          >
-                            삭제
-                          </button>
-                        </div>
-                      </>
-                    ) : (
+        {/* 업로드 그리드 */}
+        <div className="w-full px-3">
+          <div className="grid grid-cols-2 gap-3">
+            {files.map((_, idx) => (
+              <div
+                key={idx}
+                className="h-32 bg-neutral-200 rounded-lg outline outline-1 outline-neutral-400 flex flex-col items-center justify-center gap-2 relative overflow-hidden"
+              >
+                {previews[idx] ? (
+                  <>
+                    <img
+                      src={previews[idx] as string}
+                      alt={`preview-${idx}`}
+                      className="absolute inset-0 w-full h-full object-cover"
+                      onClick={() => onPick(idx)}
+                    />
+                    <div className="absolute bottom-1 left-1 right-1 flex gap-2">
                       <button
                         type="button"
                         onClick={() => onPick(idx)}
-                        className="flex flex-col items-center justify-center gap-1"
+                        className="flex-1 px-2 py-1 text-[11px] rounded bg-white border border-blue-700"
                       >
-                        <img
-                          src="/assets/image.svg"
-                          alt="image icon"
-                          className="w-6 h-6"
-                        />
-                        <span className="text-neutral-700 text-[10px] font-semibold">
-                          사진 추가
-                        </span>
+                        교체
                       </button>
-                    )}
-                    <input
-                      ref={inputs[idx]}
-                      type="file"
-                      accept="image/*"
-                      className="hidden"
-                      onChange={(e) => onChange(idx, e)}
+                      <button
+                        type="button"
+                        onClick={() => onRemove(idx)}
+                        className="flex-1 px-2 py-1 text-[11px] text-white rounded bg-blue-500 border border-blue-700"
+                      >
+                        삭제
+                      </button>
+                    </div>
+                  </>
+                ) : (
+                  <button
+                    type="button"
+                    onClick={() => onPick(idx)}
+                    className="flex flex-col items-center justify-center gap-1"
+                  >
+                    <img
+                      src="/assets/image.svg"
+                      alt="image icon"
+                      className="w-6 h-6"
                     />
-                  </div>
-                ))}
+                    <span className="text-neutral-700 text-[10px] font-semibold">
+                      사진 추가
+                    </span>
+                  </button>
+                )}
+                <input
+                  ref={inputs[idx]}
+                  type="file"
+                  accept="image/*"
+                  className="hidden"
+                  onChange={(e) => onChange(idx, e)}
+                />
               </div>
-            </div>
-
-            {/* 버튼 */}
-            <div className="w-full px-3 pb-2 flex items-center gap-3">
-              <SecondaryButton
-                fullWidth={false}
-                className="flex-1"
-                onClick={() => navigate(ROUTE_PATH.REGISTER_STEP1)}
-                disabled={isUploading}
-              >
-                이전
-              </SecondaryButton>
-
-              <PrimaryButton
-                fullWidth={false}
-                className="flex-1"
-                onClick={onNext}
-                disabled={isUploading}
-              >
-                {isUploading ? "업로드 중..." : "다음"}
-              </PrimaryButton>
-            </div>
-
-            {/* 하단 네비게이션 */}
-            <BottomNav />
+            ))}
           </div>
         </div>
+
+        {/* 버튼 */}
+        <div className="w-full px-3 pb-2 flex items-center gap-3">
+          <SecondaryButton
+            fullWidth={false}
+            className="flex-1"
+            onClick={() => navigate(ROUTE_PATH.REGISTER_STEP1)}
+            disabled={isUploading}
+          >
+            이전
+          </SecondaryButton>
+
+          <PrimaryButton
+            fullWidth={false}
+            className="flex-1"
+            onClick={onNext}
+            disabled={isUploading}
+          >
+            {isUploading ? "업로드 중..." : "다음"}
+          </PrimaryButton>
+        </div>
+
+        {/* 하단 네비게이션 */}
+        <BottomNav />
       </div>
     </div>
   );
