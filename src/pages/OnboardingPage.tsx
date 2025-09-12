@@ -18,9 +18,45 @@ export default function OnboardingPage() {
 
         {/* 기능 리스트 */}
         <div className="mt-6 rounded-2xl border-2 border-blue-400 p-4 text-left space-y-3">
-          <FeatureRow>유휴 주차 공간 공유</FeatureRow>
-          <FeatureRow>AI 음성 인식 기반 검색</FeatureRow>
-          <FeatureRow>쉽고 빠른 대여와 반납</FeatureRow>
+          <div className="flex items-center gap-3">
+            <div className="grid h-6 w-6 place-items-center rounded-full bg-blue-500">
+              {/* 간단 아이콘 대체 */}
+              <img
+                src="/assets/onBoarding_1.svg"
+                alt="icon"
+                className="h-3.5 w-3.5"
+              />
+            </div>
+            <span className="text-blue-500 text-base font-bold leading-7">
+              유휴 주차 공간 공유
+            </span>
+          </div>
+          <div className="flex items-center gap-3">
+            <div className="grid h-6 w-6 place-items-center rounded-full bg-blue-500">
+              {/* 간단 아이콘 대체 */}
+              <img
+                src="/assets/onBoarding_2.svg"
+                alt="icon"
+                className="h-3.5 w-3.5"
+              />
+            </div>
+            <span className="text-blue-500 text-base font-bold leading-7">
+              AI 음성 인식 기반 주차공간 검색
+            </span>
+          </div>
+          <div className="flex items-center gap-3">
+            <div className="grid h-6 w-6 place-items-center rounded-full bg-blue-500">
+              {/* 간단 아이콘 대체 */}
+              <img
+                src="/assets/onBoarding_3.svg"
+                alt="icon"
+                className="h-3.5 w-3.5"
+              />
+            </div>
+            <span className="text-blue-500 text-base font-bold leading-7">
+              쉽고 빠른 대여와 반납
+            </span>
+          </div>
         </div>
 
         {/* CTA */}
