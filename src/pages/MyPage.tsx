@@ -3,9 +3,14 @@ import { useNavigate } from "react-router-dom";
 import Header from "@/components/Header";
 import BottomNav from "@/components/layout/BottomNav";
 import { ROUTE_PATH } from "@/routes/paths";
+import { useProfile } from "@/hooks/useProfile";
+import { ProfileCard } from "@/components/ProfileCard";
+import { ProfileEmptyCard } from "@/components/ProfileEmptyCard";
+import ProfileEditorModal from "@/components/ProfileEditorModal";
 
 export default function MyPage() {
   const nav = useNavigate();
+  const { profile, updateProfile, isComplete } = useProfile();
 
   return (
     <div className="min-h-svh w-full bg-zinc-50">
@@ -17,52 +22,11 @@ export default function MyPage() {
 
           <div className="w-full px-3 pt-2 flex flex-col gap-3 pb-[calc(88px+env(safe-area-inset-bottom))]">
             {/* Profile card */}
-            <div className="w-full bg-white rounded-xl p-3 flex flex-col sm:flex-row sm:items-center gap-3">
-              {/* avatar */}
-              <div className="flex items-center gap-3">
-                <div className="size-20 sm:size-24 rounded-full bg-slate-200 shrink-0" />
-                {/* name + temp on small screens stack next to avatar; on larger, move to right column */}
-              </div>
-
-              {/* right column (name + temp) */}
-              <div className="hidden sm:flex flex-col justify-center flex-1 min-w-0">
-                <div className="flex items-baseline gap-1">
-                  <span className="text-2xl font-semibold truncate">
-                    김대학
-                  </span>
-                  <span className="text-sm font-semibold text-neutral-600">
-                    님
-                  </span>
-                </div>
-                <div className="mt-1 flex items-center gap-2">
-                  <img
-                    src="/assets/mypage_temperature.svg"
-                    alt="temperatureIcon"
-                    className="w-5 h-5"
-                  />
-                  <span className="text-amber-500 text-lg font-bold leading-none">
-                    85°C
-                  </span>
-                  <span className="text-neutral-600 text-sm font-semibold leading-none">
-                    매너 온도
-                  </span>
-                </div>
-              </div>
-
-              {/* settings button */}
-              <button
-                type="button"
-                aria-label="프로필 설정"
-                className="ml-auto self-start sm:self-auto p-2 rounded-lg bg-neutral-100 hover:bg-neutral-200 transition-colors"
-                onClick={() => nav(ROUTE_PATH.MYPAGE)}
-              >
-                <img
-                  src="/assets/mypage_edit.svg"
-                  alt="edit icon"
-                  className="w-5 h-5"
-                />
-              </button>
-            </div>
+            {isComplete ? (
+              <ProfileCard profile={profile} />
+            ) : (
+              <ProfileEmptyCard />
+            )}
 
             {/* Points card */}
             <div className="w-full bg-blue-600 rounded-xl px-4 py-7 flex flex-col gap-2">
@@ -147,6 +111,11 @@ export default function MyPage() {
           <BottomNav />
         </div>
       </div>
+      <ProfileEditorModal
+        openActions={["setup-profile", "edit-profile"]}
+        value={profile}
+        onSave={updateProfile}
+      />
     </div>
   );
 }
