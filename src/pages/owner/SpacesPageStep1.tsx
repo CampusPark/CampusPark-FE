@@ -93,7 +93,7 @@ export default function SpacesPageStep1() {
                 aria-label="상세 주소"
                 value={detailAddress}
                 onChange={(e) => setDetailAddress(e.target.value)}
-                placeholder="예) 엘레강스빌 101동 1203호 / 지하 1층 12번 구획"
+                placeholder="빌라, 건물 이름 등 상세 주소"
                 required
                 className="w-full h-8 px-2 rounded-lg border border-neutral-300 focus:outline-none"
               />
