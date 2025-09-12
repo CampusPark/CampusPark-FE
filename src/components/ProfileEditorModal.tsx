@@ -107,7 +107,11 @@ export default function ProfileEditorModal({
           <button
             className="h-9 px-4 rounded bg-blue-600 text-white hover:bg-blue-500"
             onClick={() => {
-              onSave({ nickname: nickname.trim() || null, avatarUrl: preview });
+              onSave({
+                nickname: nickname.trim() || null,
+                avatarUrl: preview,
+                mannerTemp: value.mannerTemp ?? 100, // 👈 초기값 100
+              });
               setParams({});
             }}
           >
