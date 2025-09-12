@@ -74,7 +74,10 @@ export default function BottomNav() {
 
             <li className="flex w-20 flex-col items-center justify-center">
               <NavButton
-                active={pathname.startsWith(ROUTE_PATH.REGISTER)}
+                active={
+                  pathname.startsWith(ROUTE_PATH.REGISTER) ||
+                  pathname.startsWith(ROUTE_PATH.MONITOR)
+                }
                 onClick={() => nav(ROUTE_PATH.REGISTER)}
                 label="공간 등록"
               >

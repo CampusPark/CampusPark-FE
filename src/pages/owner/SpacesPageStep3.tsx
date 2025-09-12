@@ -30,14 +30,42 @@ export default function SpacesPageStep3() {
     return h12 === 12 ? 12 : h12 + 12; // 12PM => 12
   };
 
+  // YYYY-MM-DD 문자열 반환
+  const getTodayDateStr = () => {
+    const d = new Date();
+    const yyyy = d.getFullYear();
+    const mm = String(d.getMonth() + 1).padStart(2, "0");
+    const dd = String(d.getDate()).padStart(2, "0");
+    return `${yyyy}-${mm}-${dd}`;
+  };
+
+  // 특정 날짜(YYYY-MM-DD) + 시(0~23) -> ISO-like 문자열
+  const toISOOnDate = (dateStr: string, hour24: number) =>
+    `${dateStr}T${String(hour24).padStart(2, "0")}:00:00`;
+
   const handleNext = () => {
     const s = to24h(startPeriod, startHour);
     const e = to24h(endPeriod, endHour);
+
     if (s >= e) {
       window.alert("종료 시간은 시작 시간보다 커야 합니다.");
       return;
     }
-    // TODO: 전역 상태/서버 전송이 필요하면 여기서 s,e 값을 사용해 저장하세요.
+
+    // 기준 날짜: 있으면 사용, 없으면 오늘 날짜
+    const baseDate = localStorage.getItem("parking_date") || getTodayDateStr();
+
+    // API 스펙(availableStartTime / availableEndTime)에 맞게 저장
+    const startISO = toISOOnDate(baseDate, s);
+    const endISO = toISOOnDate(baseDate, e);
+
+    localStorage.setItem("parking_availableStartTime", startISO);
+    localStorage.setItem("parking_availableEndTime", endISO);
+
+    // 표시용 라벨(선택)
+    const label = `${startPeriod} ${String(startHour).padStart(2, "0")}:00 ~ ${endPeriod} ${String(endHour).padStart(2, "0")}:00`;
+    localStorage.setItem("parking_time_range_label", label);
+
     navigate(ROUTE_PATH.REGISTER_STEP4);
   };
 

@@ -1,5 +1,6 @@
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
+// import axios from "axios"; // ❌ 지금은 백엔드 미연동이므로 주석
 import Header from "@/components/Header";
 import BottomNav from "@/components/layout/BottomNav";
 import ProgressBar from "@/components/ProgressBar";
@@ -12,22 +13,117 @@ export default function SpacesPageStep5() {
   const [price, setPrice] = useState<number | "">("");
   const [error, setError] = useState("");
 
+  // 가격 검증(100 단위)
   const validate = (value: number | "") => {
-    if (value === "") return "";
-    if (value % 100 !== 0) {
-      return "포인트는 100 단위로 입력해주세요.";
-    }
+    if (value === "") return "가격을 입력해주세요.";
+    if (value < 0) return "0 이상으로 입력해주세요.";
+    if (value % 100 !== 0) return "포인트는 100 단위로 입력해주세요.";
     return "";
   };
 
-  const handleSubmit = () => {
+  // 로컬 히스토리에 누적 저장
+  const pushLocalSubmission = (payload: any) => {
+    const KEY = "parking_submissions";
+    const list = JSON.parse(localStorage.getItem(KEY) || "[]");
+    list.push({
+      id: (globalThis as any).crypto?.randomUUID?.() ?? `local-${Date.now()}`,
+      createdAt: new Date().toISOString(),
+      payload,
+    });
+    localStorage.setItem(KEY, JSON.stringify(list));
+  };
+
+  const handleSubmit = async () => {
     const err = validate(price);
     setError(err);
+    if (err) return;
 
-    if (!err) {
-      // 유효할 경우에만 이동
-      navigate(ROUTE_PATH.MONITOR);
+    // 1) 가격 저장
+    localStorage.setItem("parking_price", String(price));
+
+    // 2) 이전 스텝 값 모으기
+    const userId = Number(localStorage.getItem("parking_userId") || "1"); // 필요 시 교체
+    const address = localStorage.getItem("parking_address") || "";
+    const name = localStorage.getItem("parking_name") || "";
+    const latitude = parseFloat(localStorage.getItem("parking_lat") || "0");
+    const longitude = parseFloat(localStorage.getItem("parking_lng") || "0");
+    const availableStartTime =
+      localStorage.getItem("parking_availableStartTime") || "";
+    const availableEndTime =
+      localStorage.getItem("parking_availableEndTime") || "";
+    const availableCount = parseInt(
+      localStorage.getItem("parking_availableCount") || "0",
+      10
+    );
+    const finalPrice = parseInt(
+      localStorage.getItem("parking_price") || "0",
+      10
+    );
+
+    // ✅ 사진 & 썸네일 읽기 (Step2에서 저장)
+    const photos: string[] =
+      JSON.parse(localStorage.getItem("parking_photos") || "[]") ?? [];
+    let thumbnailUrl =
+      localStorage.getItem("parking_thumbnailUrl") ?? (photos[0] || "");
+
+    // 필수값 간단 검증
+    if (!address) {
+      alert("주소 정보가 없습니다. Step1에서 주소를 입력해주세요.");
+      navigate(ROUTE_PATH.REGISTER_STEP1);
+      return;
     }
+    if (!availableStartTime || !availableEndTime) {
+      alert("대여 가능 시간이 없습니다. Step3에서 시간을 설정해주세요.");
+      navigate(ROUTE_PATH.REGISTER_STEP3);
+      return;
+    }
+    if (!availableCount || availableCount < 1) {
+      alert("주차 가능 대수가 없습니다. Step4에서 대수를 입력해주세요.");
+      navigate(ROUTE_PATH.REGISTER_STEP4);
+      return;
+    }
+    if (!photos.length) {
+      alert("사진이 없습니다. Step2에서 최소 1장의 사진을 업로드해주세요.");
+      navigate(ROUTE_PATH.REGISTER_STEP2);
+      return;
+    }
+    // 썸네일 누락 시 첫 번째 사진으로 보정
+    if (!thumbnailUrl) thumbnailUrl = photos[0];
+
+    // 3) API 스펙과 동일한 payload (로컬 전용) + photos/thumbnailUrl 포함
+    const payload = {
+      address,
+      name, // address 에서 상세주소 값(빌라, 건물 이름)추출 -> 공간 카드 랜더링 용이
+      latitude,
+      longitude,
+      availableStartTime, // "YYYY-MM-DDTHH:00:00"
+      availableEndTime, // "YYYY-MM-DDTHH:00:00"
+      price: finalPrice,
+      availableCount,
+      photos, // object URL 배열 (해커톤 임시)
+      thumbnailUrl, // 첫 번째 사진(또는 사용자가 지정한 값)
+    };
+
+    // 미리보기/테스트용 저장
+    localStorage.setItem("parking_lastPayload", JSON.stringify(payload));
+    pushLocalSubmission(payload);
+
+    // 4) 백엔드 요청은 지금 주석
+    // try {
+    //   const res = await axios.post(`/api/parkingspaces?userId=${userId}`, payload);
+    //   if (res.status === 201) {
+    //     navigate(ROUTE_PATH.MONITOR);
+    //     return;
+    //   } else {
+    //     alert("등록에 실패했습니다. 잠시 후 다시 시도해주세요.");
+    //   }
+    // } catch (e) {
+    //   console.error(e);
+    //   alert("서버와 통신 중 오류가 발생했습니다.");
+    // }
+
+    // 5) 바로 완료 화면(테스트 페이지)로 이동
+    navigate(ROUTE_PATH.MONITOR);
   };
 
   return (
@@ -75,7 +171,8 @@ export default function SpacesPageStep5() {
                 <span className="text-neutral-600 text-sm font-semibold">
                   / 시간
                 </span>
-                {/* AI 추천 버튼: 클릭 & 커서만 */}
+
+                {/* AI 추천 (임시 비활성 로직) */}
                 <button
                   type="button"
                   onClick={() => {}}
@@ -107,7 +204,7 @@ export default function SpacesPageStep5() {
               fullWidth={false}
               className="flex-1"
               onClick={handleSubmit}
-              disabled={price === ""}
+              disabled={price === ""} // 비어있으면 비활성화
             >
               등록 완료
             </PrimaryButton>

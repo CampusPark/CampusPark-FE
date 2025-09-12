@@ -6,7 +6,12 @@ type ParkingSpaceCardProps = {
   points: number;
   remainingMinutes?: number;
   timeWindow?: string;
+  /** 썸네일 URL (없으면 photos[0] 시도) */
   thumbnailUrl?: string;
+  /** 사진 목록 (object URL 또는 실제 URL) */
+  photos?: string[];
+  /** 카드 클릭 동작 (선택) */
+  onClick?: () => void;
 };
 
 export default function ParkingSpaceCard({
@@ -16,29 +21,70 @@ export default function ParkingSpaceCard({
   remainingMinutes,
   timeWindow,
   thumbnailUrl,
+  photos = [],
+  onClick,
 }: ParkingSpaceCardProps) {
-  const formattedPoints = `${points.toLocaleString("ko-KR")}P`;
+  const [imgError, setImgError] = React.useState(false);
+
+  const fallbackThumb = React.useMemo(
+    () => thumbnailUrl || photos[0] || "",
+    [thumbnailUrl, photos]
+  );
+  const showThumb = !!fallbackThumb && !imgError;
+  const photoCount = photos.length;
+  const formattedPoints = `${(Number.isFinite(points) ? points : 0).toLocaleString("ko-KR")}P`;
+
+  const cardClass = [
+    "w-full p-3 bg-white rounded-lg flex items-center gap-3",
+    onClick
+      ? "cursor-pointer hover:bg-neutral-50 active:opacity-95 transition-colors"
+      : "",
+  ].join(" ");
+
+  const handleKeyDown = (e: React.KeyboardEvent<HTMLDivElement>) => {
+    if (onClick && (e.key === "Enter" || e.key === " ")) {
+      e.preventDefault();
+      onClick();
+    }
+  };
 
   return (
     <div
-      className="
-        w-full p-3 bg-white rounded-lg
-        flex items-center gap-3
-      "
+      className={cardClass}
+      role={onClick ? "button" : undefined}
+      tabIndex={onClick ? 0 : -1}
+      onClick={onClick}
+      onKeyDown={handleKeyDown}
+      aria-label={`${name} 카드`}
     >
       {/* 썸네일: 고정 크기 + 가운데 정렬 */}
-      <div
-        className="
-          relative w-24 h-28 flex-shrink-0 overflow-hidden rounded-lg bg-amber-100
-        "
-      >
-        {thumbnailUrl && (
+      <div className="relative w-24 h-28 flex-shrink-0 overflow-hidden rounded-lg bg-neutral-100">
+        {showThumb ? (
           // eslint-disable-next-line @next/next/no-img-element
           <img
-            src={thumbnailUrl}
+            src={fallbackThumb}
             alt={`${name} thumbnail`}
             className="w-full h-full object-cover"
+            loading="lazy"
+            onError={() => setImgError(true)}
           />
+        ) : (
+          <div className="w-full h-full flex items-center justify-center">
+            {/* 기본 플레이스홀더 아이콘 */}
+            {/* 필요하면 /assets/image.svg로 교체 */}
+            <img
+              src="/assets/image.svg"
+              alt="이미지 없음"
+              className="w-6 h-6 opacity-60"
+            />
+          </div>
+        )}
+
+        {/* 사진 개수 배지 (2장 이상일 때만) */}
+        {photoCount > 1 && (
+          <div className="absolute bottom-1 right-1 px-1.5 h-5 rounded-full bg-black/60 backdrop-blur text-white text-[10px] font-semibold flex items-center">
+            {photoCount}장
+          </div>
         )}
       </div>
 

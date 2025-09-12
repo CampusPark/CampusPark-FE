@@ -13,8 +13,6 @@ export default function SpacesPageStep2() {
   const navigate = useNavigate();
 
   // 4칸 고정 업로드 슬롯
-  // 상태 관리
-  // 업로드 칸에 들어간 파일 상태, 업로드 진행중 여부
   const [files, setFiles] = useState<(File | null)[]>([null, null, null, null]);
   const [isUploading, setIsUploading] = useState(false);
 
@@ -26,13 +24,12 @@ export default function SpacesPageStep2() {
     useRef<HTMLInputElement>(null),
   ];
 
-  // 썸네일 미리보기
+  // 미리보기 URL (object URL)
   const previews = useMemo(
     () => files.map((f) => (f ? URL.createObjectURL(f) : null)),
     [files]
   );
 
-  // 버튼을 클릭하면 input[type="file"] 요소를 클릭
   const onPick = (idx: number) => inputs[idx].current?.click();
 
   const onChange = (idx: number, e: React.ChangeEvent<HTMLInputElement>) => {
@@ -67,22 +64,17 @@ export default function SpacesPageStep2() {
   };
 
   // 실제 업로드 함수(백엔드 엔드포인트에 맞게 수정하세요)
+  // 해커톤: 서버 없이 object URL을 로컬 저장
   const uploadImages = async (selected: File[]): Promise<UploadResponse> => {
-    // 백엔드 준비 전 임시 저장(프론트만) 버전 —— sessionStorage
-    // 실제 서버 업로드가 가능하면 아래 FormData 방식으로 교체:
-    //
+    // 이미 previews에 object URL이 있으므로 재생성 없이 selected 기준으로 생성해도 OK
+    const objectUrls = selected.map((f) => URL.createObjectURL(f));
+
+    // 👉 운영 전환 시: 서버 업로드 → 실제 이미지 URL 반환받아 저장
     // const form = new FormData();
     // selected.forEach((f, i) => form.append("images", f, f.name ?? `image-${i}.jpg`));
     // const res = await fetch("/api/parking-spaces/images", { method: "POST", body: form });
-    // if (!res.ok) throw new Error("업로드 실패");
-    // return (await res.json()) as UploadResponse;
+    // const { urls } = (await res.json()) as UploadResponse;
 
-    const objectUrls = selected.map((f) => URL.createObjectURL(f));
-    // 임시로 URL 목록을 sessionStorage에 저장 (실서비스에서는 서버가 반환한 URL 사용)
-    sessionStorage.setItem(
-      "register.step2.imageObjectUrls",
-      JSON.stringify(objectUrls)
-    );
     return { urls: objectUrls };
   };
 
@@ -92,16 +84,18 @@ export default function SpacesPageStep2() {
       alert("최소 1장의 사진을 업로드해주세요.");
       return;
     }
+
     try {
       setIsUploading(true);
+
+      // 업로드 (지금은 object URL로 대체)
       const { urls } = await uploadImages(selected);
 
-      // 다음 단계에서 쓸 수 있도록 저장(실서비스라면 서버에서 받은 고정 URL/키를 저장)
-      sessionStorage.setItem(
-        "register.step2.uploadedUrls",
-        JSON.stringify(urls)
-      );
+      // ✅ 로컬 저장: 사진 배열 + 썸네일(첫 번째 사진)
+      localStorage.setItem("parking_photos", JSON.stringify(urls));
+      localStorage.setItem("parking_thumbnailUrl", urls[0]);
 
+      // 다음 스텝으로 이동
       navigate(ROUTE_PATH.REGISTER_STEP3);
     } catch (e) {
       console.error(e);
