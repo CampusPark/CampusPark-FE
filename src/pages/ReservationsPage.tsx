@@ -104,7 +104,9 @@ export default function ReservationsPage() {
             <ActiveCard
               key={item.id}
               data={item}
-              onClick={() => nav(ROUTE_PATH.SPOT_DETAIL.replace(":id", "1"))}
+              onClick={() =>
+                nav(ROUTE_PATH.RESERVATION_DETAIL.replace(":id", "1"))
+              }
             />
           ) : (
             <DoneCard key={item.id} data={item} />
