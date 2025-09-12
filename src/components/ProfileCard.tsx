@@ -6,7 +6,7 @@ export function ProfileCard({ profile }: { profile: Profile }) {
   const nav = useNavigate();
 
   return (
-    <div className="w-full bg-white rounded-xl p-3 flex flex-col sm:flex-row sm:items-center gap-3">
+    <div className="w-full bg-white rounded-xl px-3 py-4 flex flex-col sm:flex-row sm:items-center gap-3">
       {/* avatar */}
       <div className="flex items-center gap-3">
         {profile.avatarUrl ? (
