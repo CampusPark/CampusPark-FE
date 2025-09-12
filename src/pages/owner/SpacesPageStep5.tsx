@@ -93,7 +93,7 @@ export default function SpacesPageStep5() {
     // 3) API 스펙과 동일한 payload (로컬 전용) + photos/thumbnailUrl 포함
     const payload = {
       address,
-      name,
+      name, // address 에서 상세주소 값(빌라, 건물 이름)추출 -> 공간 카드 랜더링 용이
       latitude,
       longitude,
       availableStartTime, // "YYYY-MM-DDTHH:00:00"
