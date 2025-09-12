@@ -7,6 +7,7 @@ export const ROUTE_PATH = {
   SPOT_BOOKING: "/spots/booking", // 예약 (id는 state로 전달)
 
   RESERVATIONS: "/reservations", // 예약 내역
+  RESERVATION_DETAIL: "/reservations/in-use/:id",
   REGISTER: "/register", // 등록 루트 (리다이렉트 용)
   REGISTER_STEP1: "/register/step-1",
   REGISTER_STEP2: "/register/step-2",

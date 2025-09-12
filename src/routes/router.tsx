@@ -14,6 +14,7 @@ import SpotDetailPage from "@/pages/SpotDetailPage";
 import MyPage from "@/pages/MyPage";
 import SpotBookingPage from "@/pages/SpotBookingPage";
 import ReservationsPage from "@/pages/ReservationsPage";
+import ReservationDetailPage from "@/pages/ReservationDetailPage";
 
 export default function AppRouter() {
   return (
@@ -25,6 +26,10 @@ export default function AppRouter() {
       <Route path={ROUTE_PATH.SPOT_BOOKING} element={<SpotBookingPage />} />
 
       <Route path={ROUTE_PATH.RESERVATIONS} element={<ReservationsPage />} />
+      <Route
+        path={ROUTE_PATH.RESERVATION_DETAIL}
+        element={<ReservationDetailPage />}
+      />
 
       {/* /register로 들어오면 step-1로 안내 */}
       <Route
