@@ -52,7 +52,7 @@ export default function HomePage() {
       {/* 아래 패널 */}
       <section className="relative -mt-2 w-full rounded-t-md py-3">
         {/* 섹션 타이틀 */}
-        <h2 className="mt-8 mb-4 text-[16px] font-bold leading-4 text-black">
+        <h2 className="mt-8 m-4 text-[16px] font-bold leading-4 text-black">
           근처 주차 공간
         </h2>
 
@@ -75,7 +75,7 @@ function SpotCard({ spot }: { spot: Spot }) {
   return (
     <Link
       to={to}
-      className="flex h-[90px] w-full items-center gap-2 rounded-lg bg-white p-1 shadow-[0_0_8px_rgba(0,0,0,0.25)]
+      className="flex h-[90px] mx-auto w-full max-w-[680px] items-center gap-2 rounded-lg bg-white p-1 shadow-[0_0_8px_rgba(0,0,0,0.25)]
                  hover:shadow-[0_2px_12px_rgba(0,0,0,0.18)] transition-shadow
                  focus:outline-none focus:ring-2 focus:ring-blue-500"
       aria-label={`${spot.name} 상세로 이동`}

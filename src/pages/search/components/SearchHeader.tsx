@@ -12,7 +12,7 @@ export default function SearchHeader({
   onBack,
 }: Props) {
   return (
-    <header className="sticky top-0 z-30 bg-white/95 px-3 pb-2 pt-2 backdrop-blur supports-[backdrop-filter]:bg-white/75">
+    <header className="sticky top-3 z-30 bg-white/95 px-3 pb-2 pt-2 backdrop-blur supports-[backdrop-filter]:bg-white/75">
       <div className="flex items-center gap-2">
         <button
           type="button"
