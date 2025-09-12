@@ -1,5 +1,6 @@
 import { useNavigate, useParams } from "react-router-dom";
 import { useEffect, useState } from "react";
+import { ROUTE_PATH } from "@/routes/paths";
 
 // 필요한 타입은 프로젝트 상황에 맞게 교체
 type SpotDetail = {
@@ -173,14 +174,25 @@ export default function SpotDetailPage() {
         className="pointer-events-none fixed inset-x-0 bottom-0 z-50 mx-auto w-full max-w-[720px]
                    bg-gradient-to-t from-white/90 to-white/0 pb-[calc(env(safe-area-inset-bottom,0)+16px)] pt-6"
       >
-        <div className="pointer-events-auto mx-auto w-full max-w-[680px] px-2">
+        <div className="pointer-events-auto mx-auto w-full max-w-[700px] px-2">
           <button
             type="button"
-            className="h-12 w-full rounded-xl bg-blue-500 text-[16px] font-bold text-white shadow-md"
-            // onClick={...} // 예약 흐름 연결
+            onClick={() =>
+              nav(ROUTE_PATH.SPOT_BOOKING, {
+                state: {
+                  // 서버에 필요한 id만 넘김
+                  parkingSpaceId: data.id,
+                  // 화면 표시용으로만 쓰고 싶으면 spotName 정도만 옵션으로 넘겨도 OK
+                  spotName: data.name,
+                  // defaultRange는 UI 기본값이니 유지 가능
+                  defaultRange: { start: "14:00", end: "18:00" },
+                },
+              })
+            }
+            className="w-full rounded-xl bg-blue-500 px-3 py-3 text-[18px] font-bold text-white shadow"
           >
             예약하기
-          </button>
+          </button>{" "}
         </div>
       </div>
     </div>
@@ -204,7 +216,7 @@ function Header({
         aria-label="뒤로"
         className="grid h-6 w-6 place-items-center"
       >
-        <span className="material-symbols-outlined text-[22px] leading-none">
+        <span className="material-symbols-outlined text-[26px] leading-none">
           chevron_left
         </span>
       </button>
