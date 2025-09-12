@@ -1,5 +1,3 @@
-import React from "react";
-
 type ProgressBarProps = {
   /** 현재 단계 (1 ~ 4) */
   currentStep: number;

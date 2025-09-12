@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 // import axios from "axios"; // ❌ 지금은 백엔드 미연동이므로 주석
 import Header from "@/components/Header";
@@ -22,11 +22,24 @@ export default function SpacesPageStep5() {
   };
 
   // 로컬 히스토리에 누적 저장
-  const pushLocalSubmission = (payload: any) => {
+  type ParkingSubmissionPayload = {
+    address: string;
+    name: string;
+    latitude: number;
+    longitude: number;
+    availableStartTime: string;
+    availableEndTime: string;
+    price: number;
+    availableCount: number;
+    photos: string[];
+    thumbnailUrl: string;
+  };
+
+  const pushLocalSubmission = (payload: ParkingSubmissionPayload) => {
     const KEY = "parking_submissions";
     const list = JSON.parse(localStorage.getItem(KEY) || "[]");
     list.push({
-      id: (globalThis as any).crypto?.randomUUID?.() ?? `local-${Date.now()}`,
+      id: globalThis.crypto?.randomUUID?.() ?? `local-${Date.now()}`,
       createdAt: new Date().toISOString(),
       payload,
     });
@@ -42,7 +55,7 @@ export default function SpacesPageStep5() {
     localStorage.setItem("parking_price", String(price));
 
     // 2) 이전 스텝 값 모으기
-    const userId = Number(localStorage.getItem("parking_userId") || "1"); // 필요 시 교체
+    // const userId = Number(localStorage.getItem("parking_userId") || "1"); // 필요 시 교체
     const address = localStorage.getItem("parking_address") || "";
     const name = localStorage.getItem("parking_name") || "";
     const latitude = parseFloat(localStorage.getItem("parking_lat") || "0");

@@ -126,7 +126,7 @@ export default function SpacesPageStep2() {
             {/* 업로드 그리드 */}
             <div className="w-full px-3">
               <div className="grid grid-cols-2 gap-3">
-                {files.map((f, idx) => (
+                {files.map((_, idx) => (
                   <div
                     key={idx}
                     className="h-32 bg-neutral-200 rounded-lg outline outline-1 outline-neutral-400 flex flex-col items-center justify-center gap-2 relative overflow-hidden"

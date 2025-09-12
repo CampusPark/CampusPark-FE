@@ -1,5 +1,5 @@
 // SpacesPageStep1.tsx
-import React, { useState, useRef } from "react";
+import { useState, useRef } from "react";
 import { useNavigate } from "react-router-dom";
 import Header from "@/components/Header";
 import BottomNav from "@/components/layout/BottomNav";

@@ -88,7 +88,7 @@ export default function MonitorPage() {
                   return (
                     <ParkingSpaceCard
                       key={item.id}
-                      name={item.payload.name || props.name} // 🔁 name을 payload.name 우선 사용
+                      name={props.name}
                       location={props.location}
                       points={props.points}
                       timeWindow={props.timeWindow}
