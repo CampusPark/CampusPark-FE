@@ -1,6 +1,6 @@
+// SpacesPageStep5.tsx
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
-// import axios from "axios"; // ❌ 지금은 백엔드 미연동이므로 주석
 import Header from "@/components/Header";
 import BottomNav from "@/components/layout/BottomNav";
 import ProgressBar from "@/components/ProgressBar";
@@ -8,10 +8,20 @@ import PrimaryButton from "@/components/PrimaryButton";
 import SecondaryButton from "@/components/SecondaryButton";
 import { ROUTE_PATH } from "@/routes/paths";
 
+// ✅ 서비스 불러오기
+import {
+  createParkingSpace,
+  type CreateParkingSpacePayload,
+} from "@/services/parkingspace";
+
+const USE_BACKEND =
+  (import.meta.env.VITE_USE_BACKEND ?? "false").toLowerCase() === "true";
+
 export default function SpacesPageStep5() {
   const navigate = useNavigate();
   const [price, setPrice] = useState<number | "">("");
   const [error, setError] = useState("");
+  const [submitting, setSubmitting] = useState(false);
 
   // 가격 검증(100 단위)
   const validate = (value: number | "") => {
@@ -21,7 +31,7 @@ export default function SpacesPageStep5() {
     return "";
   };
 
-  // 로컬 히스토리에 누적 저장
+  // 로컬 히스토리에 누적 저장 (프리뷰/테스트)
   type ParkingSubmissionPayload = {
     address: string;
     name: string;
@@ -51,92 +61,109 @@ export default function SpacesPageStep5() {
     setError(err);
     if (err) return;
 
-    // 1) 가격 저장
-    localStorage.setItem("parking_price", String(price));
+    setSubmitting(true);
+    try {
+      // 1) 가격 저장
+      localStorage.setItem("parking_price", String(price));
 
-    // 2) 이전 스텝 값 모으기
-    // const userId = Number(localStorage.getItem("parking_userId") || "1"); // 필요 시 교체
-    const address = localStorage.getItem("parking_address") || "";
-    const name = localStorage.getItem("parking_name") || "";
-    const latitude = parseFloat(localStorage.getItem("parking_lat") || "0");
-    const longitude = parseFloat(localStorage.getItem("parking_lng") || "0");
-    const availableStartTime =
-      localStorage.getItem("parking_availableStartTime") || "";
-    const availableEndTime =
-      localStorage.getItem("parking_availableEndTime") || "";
-    const availableCount = parseInt(
-      localStorage.getItem("parking_availableCount") || "0",
-      10
-    );
-    const finalPrice = parseInt(
-      localStorage.getItem("parking_price") || "0",
-      10
-    );
+      // 2) 이전 스텝 값 모으기 (로컬)
+      const userId = Number(localStorage.getItem("parking_userId") || "1"); // 필요 시 실제 로그인 값으로 교체
+      const address = localStorage.getItem("parking_address") || "";
+      const name = localStorage.getItem("parking_name") || "";
+      const latitude = parseFloat(localStorage.getItem("parking_lat") || "0");
+      const longitude = parseFloat(localStorage.getItem("parking_lng") || "0");
+      const availableStartTime =
+        localStorage.getItem("parking_availableStartTime") || "";
+      const availableEndTime =
+        localStorage.getItem("parking_availableEndTime") || "";
+      const availableCount = parseInt(
+        localStorage.getItem("parking_availableCount") || "0",
+        10
+      );
+      const finalPrice = parseInt(
+        localStorage.getItem("parking_price") || "0",
+        10
+      );
 
-    // ✅ 사진 & 썸네일 읽기 (Step2에서 저장)
-    const photos: string[] =
-      JSON.parse(localStorage.getItem("parking_photos") || "[]") ?? [];
-    let thumbnailUrl =
-      localStorage.getItem("parking_thumbnailUrl") ?? (photos[0] || "");
+      // ✅ 사진 & 썸네일(프리뷰 전용)
+      const photos: string[] =
+        JSON.parse(localStorage.getItem("parking_photos") || "[]") ?? [];
+      let thumbnailUrl =
+        localStorage.getItem("parking_thumbnailUrl") ?? (photos[0] || "");
 
-    // 필수값 간단 검증
-    if (!address) {
-      alert("주소 정보가 없습니다. Step1에서 주소를 입력해주세요.");
-      navigate(ROUTE_PATH.REGISTER_STEP1);
-      return;
+      // 필수값 간단 검증
+      if (!address) {
+        alert("주소 정보가 없습니다. Step1에서 주소를 입력해주세요.");
+        navigate(ROUTE_PATH.REGISTER_STEP1);
+        return;
+      }
+      if (!availableStartTime || !availableEndTime) {
+        alert("대여 가능 시간이 없습니다. Step3에서 시간을 설정해주세요.");
+        navigate(ROUTE_PATH.REGISTER_STEP3);
+        return;
+      }
+      if (!availableCount || availableCount < 1) {
+        alert("주차 가능 대수가 없습니다. Step4에서 대수를 입력해주세요.");
+        navigate(ROUTE_PATH.REGISTER_STEP4);
+        return;
+      }
+      if (!photos.length) {
+        alert("사진이 없습니다. Step2에서 최소 1장의 사진을 업로드해주세요.");
+        navigate(ROUTE_PATH.REGISTER_STEP2);
+        return;
+      }
+      if (!thumbnailUrl) thumbnailUrl = photos[0];
+
+      // 3) 로컬 프리뷰용 payload 저장
+      const previewPayload: ParkingSubmissionPayload = {
+        address,
+        name,
+        latitude,
+        longitude,
+        availableStartTime, // "YYYY-MM-DDTHH:00:00"
+        availableEndTime, // "YYYY-MM-DDTHH:00:00"
+        price: finalPrice,
+        availableCount,
+        photos,
+        thumbnailUrl,
+      };
+      localStorage.setItem(
+        "parking_lastPayload",
+        JSON.stringify(previewPayload)
+      );
+      pushLocalSubmission(previewPayload);
+
+      // 4) (옵션) 백엔드 호출 — services 사용
+      if (USE_BACKEND) {
+        const backendBody: CreateParkingSpacePayload = {
+          address,
+          latitude,
+          longitude,
+          availableStartTime,
+          availableEndTime,
+          price: finalPrice,
+          availableCount,
+        };
+
+        try {
+          await createParkingSpace(userId, backendBody);
+          // 성공 시 모니터로 이동
+          navigate(ROUTE_PATH.MONITOR);
+          return;
+        } catch (e: any) {
+          console.error(e);
+          alert(
+            e?.message || "등록에 실패했습니다. 잠시 후 다시 시도해주세요."
+          );
+          return; // 실패 시 여기서 종료(원하면 프리뷰로 진행하도록 변경 가능)
+        }
+      }
+
+      // 5) 백엔드 미연동: 프리뷰 완료 화면(모니터)로 이동
+      navigate(ROUTE_PATH.MONITOR);
+    } finally {
+      setSubmitting(false);
     }
-    if (!availableStartTime || !availableEndTime) {
-      alert("대여 가능 시간이 없습니다. Step3에서 시간을 설정해주세요.");
-      navigate(ROUTE_PATH.REGISTER_STEP3);
-      return;
-    }
-    if (!availableCount || availableCount < 1) {
-      alert("주차 가능 대수가 없습니다. Step4에서 대수를 입력해주세요.");
-      navigate(ROUTE_PATH.REGISTER_STEP4);
-      return;
-    }
-    if (!photos.length) {
-      alert("사진이 없습니다. Step2에서 최소 1장의 사진을 업로드해주세요.");
-      navigate(ROUTE_PATH.REGISTER_STEP2);
-      return;
-    }
-    // 썸네일 누락 시 첫 번째 사진으로 보정
-    if (!thumbnailUrl) thumbnailUrl = photos[0];
-
-    // 3) API 스펙과 동일한 payload (로컬 전용) + photos/thumbnailUrl 포함
-    const payload = {
-      address,
-      name, // address 에서 상세주소 값(빌라, 건물 이름)추출 -> 공간 카드 랜더링 용이
-      latitude,
-      longitude,
-      availableStartTime, // "YYYY-MM-DDTHH:00:00"
-      availableEndTime, // "YYYY-MM-DDTHH:00:00"
-      price: finalPrice,
-      availableCount,
-      photos, // object URL 배열 (해커톤 임시)
-      thumbnailUrl, // 첫 번째 사진(또는 사용자가 지정한 값)
-    };
-
-    // 미리보기/테스트용 저장
-    localStorage.setItem("parking_lastPayload", JSON.stringify(payload));
-    pushLocalSubmission(payload);
-
-    // 4) 백엔드 요청은 지금 주석
-    // try {
-    //   const res = await axios.post(`/api/parkingspaces?userId=${userId}`, payload);
-    //   if (res.status === 201) {
-    //     navigate(ROUTE_PATH.MONITOR);
-    //     return;
-    //   } else {
-    //     alert("등록에 실패했습니다. 잠시 후 다시 시도해주세요.");
-    //   }
-    // } catch (e) {
-    //   console.error(e);
-    //   alert("서버와 통신 중 오류가 발생했습니다.");
-    // }
-
-    // 5) 바로 완료 화면(테스트 페이지)로 이동
-    navigate(ROUTE_PATH.MONITOR);
   };
 
   return (
@@ -173,6 +200,7 @@ export default function SpacesPageStep5() {
                       e.target.value === "" ? "" : Number(e.target.value)
                     )
                   }
+                  onBlur={() => setError(validate(price))}
                   className="w-28 h-8 rounded border border-neutral-300 bg-neutral-100 text-sm text-black px-2 
                              outline-none 
                              [&::-webkit-outer-spin-button]:appearance-none 
@@ -217,9 +245,9 @@ export default function SpacesPageStep5() {
               fullWidth={false}
               className="flex-1"
               onClick={handleSubmit}
-              disabled={price === ""} // 비어있으면 비활성화
+              disabled={price === "" || submitting}
             >
-              등록 완료
+              {submitting ? "등록 중..." : "등록 완료"}
             </PrimaryButton>
           </div>
 
