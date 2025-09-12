@@ -70,126 +70,122 @@ export default function SpacesPageStep3() {
   };
 
   return (
-    <div className="min-h-svh w-full bg-zinc-50">
-      <div className="relative mx-auto min-h-svh w-full max-w-[420px] sm:max-w-[480px] md:max-w-[640px] flex flex-col items-stretch overflow-hidden">
-        <div className="flex-1 bg-neutral-50 flex flex-col items-center gap-2">
-          <Header title="내 공간 등록하기" />
-          <div className="w-full px-3 py-1 flex flex-col justify-center items-start gap-3 overflow-hidden">
-            {/* 진행바 */}
-            <ProgressBar currentStep={3} />
+    <div className="flex-1 flex flex-col items-stretch bg-neutral-50">
+      <Header title="내 공간 등록하기" />
+      <div className="w-full px-4 py-1 flex flex-col justify-center items-start gap-3 overflow-hidden">
+        {/* 진행바 */}
+        <ProgressBar currentStep={3} />
 
-            {/* 안내 문구 */}
-            <div className="w-full p-1 inline-flex justify-start items-center gap-2.5 overflow-hidden">
-              <div className="flex justify-start items-center gap-2.5 overflow-hidden">
-                <div className="justify-center text-black text-base font-bold leading-7">
-                  언제 대여가 가능한가요?
-                </div>
-              </div>
-            </div>
-
-            {/* 시간 선택 */}
-            <div className="w-full flex flex-col justify-center items-start gap-1 overflow-hidden">
-              <div className="self-stretch py-1 flex flex-col justify-center items-start gap-1 overflow-hidden">
-                <div className="w-full px-2 inline-flex justify-start items-center gap-1 overflow-hidden">
-                  <div className="flex justify-start items-center gap-2.5 overflow-hidden">
-                    <div className="w-16 h-3.5 justify-center text-black text-[10px] font-semibold leading-none">
-                      시간 선택
-                    </div>
-                  </div>
-                </div>
-
-                {/* AM/PM(3) + 시각(7)  ~  AM/PM(3) + 시각(7) */}
-                <div className="w-full px-1 inline-flex justify-start items-center gap-1">
-                  {/* 시작 - 오전/오후 */}
-                  <select
-                    aria-label="시작 오전/오후"
-                    value={startPeriod}
-                    onChange={(e) => setStartPeriod(e.target.value as Period)}
-                    className="flex-[3] h-8 bg-white rounded border border-neutral-400 px-2 text-sm outline-none focus:outline-none focus:ring-0"
-                  >
-                    {periods.map((p) => (
-                      <option key={p} value={p}>
-                        {p}
-                      </option>
-                    ))}
-                  </select>
-
-                  {/* 시작 - 시각 */}
-                  <select
-                    aria-label="시작 시각"
-                    value={startHour}
-                    onChange={(e) => setStartHour(Number(e.target.value))}
-                    className="flex-[7] h-8 bg-white rounded border border-neutral-400 px-2 text-sm outline-none focus:outline-none focus:ring-0"
-                  >
-                    {hours.map((h) => (
-                      <option key={h} value={h}>
-                        {String(h).padStart(2, "0")}:00
-                      </option>
-                    ))}
-                  </select>
-
-                  {/* 구분자 */}
-                  <div className="shrink-0 px-3 flex items-center">
-                    <span className="text-black text-base font-semibold leading-none">
-                      ~
-                    </span>
-                  </div>
-
-                  {/* 종료 - 오전/오후 */}
-                  <select
-                    aria-label="종료 오전/오후"
-                    value={endPeriod}
-                    onChange={(e) => setEndPeriod(e.target.value as Period)}
-                    className="flex-[3] h-8 bg-white rounded border border-neutral-400 px-2 text-sm outline-none focus:outline-none focus:ring-0"
-                  >
-                    {periods.map((p) => (
-                      <option key={p} value={p}>
-                        {p}
-                      </option>
-                    ))}
-                  </select>
-
-                  {/* 종료 - 시각 */}
-                  <select
-                    aria-label="종료 시각"
-                    value={endHour}
-                    onChange={(e) => setEndHour(Number(e.target.value))}
-                    className="flex-[7] h-8 bg-white rounded border border-neutral-400 px-2 text-sm outline-none focus:outline-none focus:ring-0"
-                  >
-                    {hours.map((h) => (
-                      <option key={h} value={h}>
-                        {String(h).padStart(2, "0")}:00
-                      </option>
-                    ))}
-                  </select>
-                </div>
-              </div>
-            </div>
-
-            {/* 다음 버튼 */}
-            <div className="w-full p-3 pb-2 flex items-center gap-3">
-              <SecondaryButton
-                fullWidth={false}
-                className="flex-1"
-                onClick={() => navigate(ROUTE_PATH.REGISTER_STEP2)}
-              >
-                이전
-              </SecondaryButton>
-
-              <PrimaryButton
-                fullWidth={false}
-                className="flex-1"
-                onClick={handleNext}
-              >
-                다음
-              </PrimaryButton>
+        {/* 안내 문구 */}
+        <div className="w-full p-1 inline-flex justify-start items-center gap-2.5 overflow-hidden">
+          <div className="flex justify-start items-center gap-2.5 overflow-hidden">
+            <div className="justify-center text-black text-base font-bold leading-7">
+              언제 대여가 가능한가요?
             </div>
           </div>
+        </div>
 
-          {/* 하단 네비게이션 */}
-          <BottomNav />
+        {/* 시간 선택 */}
+        <div className="w-full flex flex-col justify-center items-start gap-1 overflow-hidden">
+          <div className="self-stretch py-1 flex flex-col justify-center items-start gap-1 overflow-hidden">
+            <div className="w-full px-2 inline-flex justify-start items-center gap-1 overflow-hidden">
+              <div className="flex justify-start items-center gap-2.5 overflow-hidden">
+                <div className="w-16 h-3.5 justify-center text-black text-[10px] font-semibold leading-none">
+                  시간 선택
+                </div>
+              </div>
+            </div>
+
+            {/* AM/PM(3) + 시각(7)  ~  AM/PM(3) + 시각(7) */}
+            <div className="w-full px-1 inline-flex justify-start items-center gap-1">
+              {/* 시작 - 오전/오후 */}
+              <select
+                aria-label="시작 오전/오후"
+                value={startPeriod}
+                onChange={(e) => setStartPeriod(e.target.value as Period)}
+                className="flex-[3] h-8 bg-white rounded border border-neutral-400 px-2 text-sm outline-none focus:outline-none focus:ring-0"
+              >
+                {periods.map((p) => (
+                  <option key={p} value={p}>
+                    {p}
+                  </option>
+                ))}
+              </select>
+
+              {/* 시작 - 시각 */}
+              <select
+                aria-label="시작 시각"
+                value={startHour}
+                onChange={(e) => setStartHour(Number(e.target.value))}
+                className="flex-[7] h-8 bg-white rounded border border-neutral-400 px-2 text-sm outline-none focus:outline-none focus:ring-0"
+              >
+                {hours.map((h) => (
+                  <option key={h} value={h}>
+                    {String(h).padStart(2, "0")}:00
+                  </option>
+                ))}
+              </select>
+
+              {/* 구분자 */}
+              <div className="shrink-0 px-3 flex items-center">
+                <span className="text-black text-base font-semibold leading-none">
+                  ~
+                </span>
+              </div>
+
+              {/* 종료 - 오전/오후 */}
+              <select
+                aria-label="종료 오전/오후"
+                value={endPeriod}
+                onChange={(e) => setEndPeriod(e.target.value as Period)}
+                className="flex-[3] h-8 bg-white rounded border border-neutral-400 px-2 text-sm outline-none focus:outline-none focus:ring-0"
+              >
+                {periods.map((p) => (
+                  <option key={p} value={p}>
+                    {p}
+                  </option>
+                ))}
+              </select>
+
+              {/* 종료 - 시각 */}
+              <select
+                aria-label="종료 시각"
+                value={endHour}
+                onChange={(e) => setEndHour(Number(e.target.value))}
+                className="flex-[7] h-8 bg-white rounded border border-neutral-400 px-2 text-sm outline-none focus:outline-none focus:ring-0"
+              >
+                {hours.map((h) => (
+                  <option key={h} value={h}>
+                    {String(h).padStart(2, "0")}:00
+                  </option>
+                ))}
+              </select>
+            </div>
+          </div>
+        </div>
+
+        {/* 다음 버튼 */}
+        <div className="w-full p-3 pb-2 flex items-center gap-3">
+          <SecondaryButton
+            fullWidth={false}
+            className="flex-1"
+            onClick={() => navigate(ROUTE_PATH.REGISTER_STEP2)}
+          >
+            이전
+          </SecondaryButton>
+
+          <PrimaryButton
+            fullWidth={false}
+            className="flex-1"
+            onClick={handleNext}
+          >
+            다음
+          </PrimaryButton>
         </div>
       </div>
+
+      {/* 하단 네비게이션 */}
+      <BottomNav />
     </div>
   );
 }

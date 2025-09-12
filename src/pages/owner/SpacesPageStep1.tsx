@@ -48,73 +48,69 @@ export default function SpacesPageStep1() {
   };
 
   return (
-    <div className="min-h-svh w-full bg-zinc-50">
-      <div className="relative mx-auto min-h-svh w-full max-w-[420px] sm:max-w-[480px] md:max-w-[640px] flex flex-col items-stretch">
-        <div className="flex-1 bg-neutral-50 flex flex-col items-center gap-2 overflow-y-auto overscroll-y-contain">
-          <Header title="내 공간 등록하기" />
-          <div className="w-full px-3 py-1 flex flex-col justify-center items-start gap-3 pb-[calc(88px+env(safe-area-inset-bottom))]">
-            <ProgressBar currentStep={1} />
+    <div className="flex-1 flex flex-col items-stretch bg-neutral-50">
+      <Header title="내 공간 등록하기" />
+      <div className="w-full px-4 py-1 flex flex-col justify-center items-start gap-3 pb-[calc(88px+env(safe-area-inset-bottom))]">
+        <ProgressBar currentStep={1} />
 
-            <div className="w-full p-1 inline-flex justify-start items-center gap-1">
-              <div className="flex justify-start items-center gap-2.5">
-                <div className="text-black text-base font-bold leading-7">
-                  주차 공간 위치를 알려주세요
-                </div>
-              </div>
+        <div className="w-full p-1 inline-flex justify-start items-center gap-2">
+          <div className="flex justify-start items-center gap-2.5">
+            <div className="text-black text-base font-bold leading-7">
+              주차 공간 위치를 알려주세요
             </div>
+          </div>
+        </div>
 
-            {/* 주소 입력 */}
-            <div className="w-full p-1 flex flex-col justify-center items-start gap-2">
-              <div className="inline-flex justify-start items-center gap-2.5">
-                <div className="text-black text-sm font-semibold leading-none">
-                  우편 번호를 입력해주세요
-                </div>
-              </div>
-
-              <div className="w-full grid grid-cols-[140px_minmax(0,1fr)] gap-2">
-                <ZipSearchInput value={zonecode} onChange={handleZipChange} />
-                <input
-                  aria-label="기본 주소"
-                  readOnly
-                  value={roadAddress}
-                  placeholder="기본 주소(도로명)"
-                  className="w-full h-8 px-3 bg-neutral-200 rounded-lg border border-neutral-400 focus:outline-none"
-                />
-              </div>
-
-              <div className="inline-flex justify-start items-center gap-2.5 pt-3">
-                <div className="text-black text-sm font-semibold leading-none">
-                  상세 주소를 입력해주세요
-                </div>
-              </div>
-
-              <input
-                ref={detailRef}
-                aria-label="상세 주소"
-                value={detailAddress}
-                onChange={(e) => setDetailAddress(e.target.value)}
-                placeholder="빌라, 건물 이름 등 상세 주소"
-                required
-                className="w-full h-8 px-2 rounded-lg border border-neutral-300 focus:outline-none"
-              />
-            </div>
-
-            {/* 지도 미리보기 (더미) */}
-            <div className="w-full h-48 p-2.5 bg-neutral-200 rounded-lg flex flex-col justify-center items-center gap-2.5">
-              <img src="/assets/map.svg" alt="map icon" className="w-12 h-12" />
-              <div className="w-44 h-5 text-neutral-600 text-xs font-semibold leading-none">
-                주소를 입력하면 위치가 표시됩니다.
-              </div>
-            </div>
-
-            <div className="w-full sticky pb-6 bottom-[calc(72px+env(safe-area-inset-bottom))] bg-neutral-50/95 backdrop-blur supports-[backdrop-filter]:bg-neutral-50/80 pt-2">
-              <PrimaryButton onClick={handleNext}>다음</PrimaryButton>
+        {/* 주소 입력 */}
+        <div className="w-full p-1 flex flex-col justify-center items-start gap-2">
+          <div className="inline-flex justify-start items-center gap-2.5">
+            <div className="text-black text-sm font-semibold leading-none">
+              우편 번호를 입력해주세요
             </div>
           </div>
 
-          <BottomNav />
+          <div className="w-full grid grid-cols-[140px_minmax(0,1fr)] gap-2">
+            <ZipSearchInput value={zonecode} onChange={handleZipChange} />
+            <input
+              aria-label="기본 주소"
+              readOnly
+              value={roadAddress}
+              placeholder="기본 주소(도로명)"
+              className="w-full h-8 px-3 bg-neutral-200 rounded-lg border border-neutral-400 focus:outline-none"
+            />
+          </div>
+
+          <div className="inline-flex justify-start items-center gap-2.5 pt-3">
+            <div className="text-black text-sm font-semibold leading-none">
+              상세 주소를 입력해주세요
+            </div>
+          </div>
+
+          <input
+            ref={detailRef}
+            aria-label="상세 주소"
+            value={detailAddress}
+            onChange={(e) => setDetailAddress(e.target.value)}
+            placeholder="빌라, 건물 이름 등 상세 주소"
+            required
+            className="w-full h-8 px-2 rounded-lg border border-neutral-300 focus:outline-none"
+          />
+        </div>
+
+        {/* 지도 미리보기 (더미) */}
+        <div className="w-full h-48 p-2.5 bg-neutral-200 rounded-lg flex flex-col justify-center items-center gap-2.5">
+          <img src="/assets/map.svg" alt="map icon" className="w-12 h-12" />
+          <div className="w-44 h-5 text-neutral-600 text-xs font-semibold leading-none">
+            주소를 입력하면 위치가 표시됩니다.
+          </div>
+        </div>
+
+        <div className="w-full sticky pb-6 bottom-[calc(72px+env(safe-area-inset-bottom))] bg-neutral-50/95 backdrop-blur supports-[backdrop-filter]:bg-neutral-50/80 pt-2">
+          <PrimaryButton onClick={handleNext}>다음</PrimaryButton>
         </div>
       </div>
+
+      <BottomNav />
     </div>
   );
 }
