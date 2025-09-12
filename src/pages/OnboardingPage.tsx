@@ -18,9 +18,9 @@ export default function OnboardingPage() {
 
         {/* 기능 리스트 */}
         <div className="mt-6 rounded-2xl border-2 border-blue-400 p-4 text-left space-y-3">
-          <FeatureRow>지도 기반 주변 주차 공간 확인</FeatureRow>
-          <FeatureRow>시간, 위치 기반 주차 공간 조회</FeatureRow>
-          <FeatureRow>AI 주차 공간 추천</FeatureRow>
+          <FeatureRow>유휴 주차 공간 공유</FeatureRow>
+          <FeatureRow>AI 음성 인식 기반 검색</FeatureRow>
+          <FeatureRow>쉽고 빠른 대여와 반납</FeatureRow>
         </div>
 
         {/* CTA */}
