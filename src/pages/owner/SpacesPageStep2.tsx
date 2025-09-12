@@ -67,22 +67,13 @@ export default function SpacesPageStep2() {
   };
 
   // 실제 업로드 함수(백엔드 엔드포인트에 맞게 수정하세요)
+  // 실제 업로드 함수
   const uploadImages = async (selected: File[]): Promise<UploadResponse> => {
-    // 백엔드 준비 전 임시 저장(프론트만) 버전 —— sessionStorage
-    // 실제 서버 업로드가 가능하면 아래 FormData 방식으로 교체:
-    //
-    // const form = new FormData();
-    // selected.forEach((f, i) => form.append("images", f, f.name ?? `image-${i}.jpg`));
-    // const res = await fetch("/api/parking-spaces/images", { method: "POST", body: form });
-    // if (!res.ok) throw new Error("업로드 실패");
-    // return (await res.json()) as UploadResponse;
-
     const objectUrls = selected.map((f) => URL.createObjectURL(f));
-    // 임시로 URL 목록을 sessionStorage에 저장 (실서비스에서는 서버가 반환한 URL 사용)
-    sessionStorage.setItem(
-      "register.step2.imageObjectUrls",
-      JSON.stringify(objectUrls)
-    );
+
+    // ✅ 하나의 키로만 저장
+    localStorage.setItem("parking_photos", JSON.stringify(objectUrls));
+
     return { urls: objectUrls };
   };
 
@@ -94,14 +85,9 @@ export default function SpacesPageStep2() {
     }
     try {
       setIsUploading(true);
-      const { urls } = await uploadImages(selected);
+      await uploadImages(selected); // 여기서 이미 localStorage에 저장됨
 
-      // 다음 단계에서 쓸 수 있도록 저장(실서비스라면 서버에서 받은 고정 URL/키를 저장)
-      sessionStorage.setItem(
-        "register.step2.uploadedUrls",
-        JSON.stringify(urls)
-      );
-
+      // 그냥 다음 Step으로 이동
       navigate(ROUTE_PATH.REGISTER_STEP3);
     } catch (e) {
       console.error(e);
