@@ -1,11 +1,11 @@
-import { useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { useSearchParams } from "react-router-dom";
 import type { Profile } from "@/hooks/useProfile";
 
 type Props = {
   openActions: string[]; // ["setup-profile", "edit-profile"]
   value: Profile;
-  onSave: (patch: Partial<Profile>) => void;
+  onSave: (patch: Partial<Profile>) => void | Promise<void>; // 👈 비동기도 허용
 };
 
 export default function ProfileEditorModal({
@@ -21,9 +21,55 @@ export default function ProfileEditorModal({
   const [preview, setPreview] = useState<string | null>(
     value.avatarUrl ?? null
   );
+  const [saving, setSaving] = useState(false);
+  const [error, setError] = useState<string | null>(null);
   const fileRef = useRef<HTMLInputElement | null>(null);
 
+  // 모달이 열릴 때마다 value로 폼 초기화
+  useEffect(() => {
+    if (open) {
+      setNickname(value.nickname ?? "");
+      setPreview(value.avatarUrl ?? null);
+      setError(null);
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [open]);
+
+  // blob URL 누수 방지
+  useEffect(() => {
+    return () => {
+      if (preview?.startsWith("blob:")) URL.revokeObjectURL(preview);
+    };
+  }, [preview]);
+
   if (!open) return null;
+
+  const handleSubmit = async () => {
+    setError(null);
+
+    // 간단한 유효성 검사 (닉네임은 선택 입력이지만 공백만은 허용 X)
+    const trimmed = nickname.trim();
+    const patch: Partial<Profile> = {
+      nickname: trimmed || null,
+      avatarUrl: preview, // 현재는 미리보기 URL(파일 업로드는 부모에서 처리 권장)
+      mannerTemp: value.mannerTemp ?? 100, // 최초 생성 시 100 보장
+    };
+
+    try {
+      setSaving(true);
+      // onSave가 동기/비동기 모두 자연스럽게 처리
+      await Promise.resolve(onSave(patch));
+      // 성공 시에만 닫기
+      setParams({});
+    } catch (e: any) {
+      // 부모(onSave)에서 에러 throw 시 여기서 사용자에게 보여줌
+      setError(
+        e?.message || "저장 중 문제가 발생했어요. 잠시 후 다시 시도해주세요."
+      );
+    } finally {
+      setSaving(false);
+    }
+  };
 
   return (
     <div className="fixed inset-0 p-1 bg-black/40 grid place-items-center z-50">
@@ -36,20 +82,17 @@ export default function ProfileEditorModal({
             <div className="relative size-20 rounded-full overflow-hidden bg-neutral-200 grid place-items-center">
               {preview ? (
                 <>
-                  {/* 배경 이미지 (전체 덮기) */}
                   <img
                     src={preview}
                     alt="preview"
                     className="absolute inset-0 w-full h-full object-cover blur-sm"
                   />
-
-                  {/* 반투명 오버레이 + 중앙 버튼 컨테이너 */}
                   <div className="absolute inset-0 grid place-items-center">
                     <button
                       type="button"
-                      className="h-6 px-3 rounded bg-neutral-200 text-[10px] font-semibold
-                       text-neutral-700 hover:bg-neutral-300"
+                      className="h-6 px-3 rounded bg-neutral-200 text-[10px] font-semibold text-neutral-700 hover:bg-neutral-300 disabled:opacity-60"
                       onClick={() => setPreview(null)}
+                      disabled={saving}
                     >
                       제거
                     </button>
@@ -58,9 +101,9 @@ export default function ProfileEditorModal({
               ) : (
                 <button
                   type="button"
-                  className="h-6 px-2 rounded bg-white text-[10px] font-semibold
-                   text-blue-700 border border-blue-700 hover:bg-blue-200"
+                  className="h-6 px-2 rounded bg-white text-[10px] font-semibold text-blue-700 border border-blue-700 hover:bg-blue-200 disabled:opacity-60"
                   onClick={() => fileRef.current?.click()}
+                  disabled={saving}
                 >
                   사진 추가
                 </button>
@@ -84,38 +127,45 @@ export default function ProfileEditorModal({
               }}
             />
           </div>
+
           {/* 닉네임 입력 */}
           <div className="w-full flex flex-col justify-center p-1 gap-1">
             <label className="text-sm font-medium pl-1">닉네임</label>
             <input
-              className="h-10 rounded border border-neutral-300 px-3 outline-none focus:ring-2 focus:ring-blue-400"
+              className="h-10 rounded border border-neutral-300 px-3 outline-none focus:ring-2 focus:ring-blue-400 disabled:bg-neutral-100"
               placeholder="닉네임을 입력하세요"
               value={nickname}
               onChange={(e) => setNickname(e.target.value)}
               maxLength={20}
+              disabled={saving}
+              onKeyDown={(e) => {
+                if (e.key === "Enter" && !saving) handleSubmit();
+              }}
             />
           </div>
         </div>
 
+        {/* 에러 메시지 */}
+        {error && (
+          <p className="mt-3 text-sm text-red-600 px-1" role="alert">
+            {error}
+          </p>
+        )}
+
         <div className="mt-5 flex justify-end gap-2">
           <button
-            className="h-9 px-4 rounded bg-neutral-200 hover:bg-neutral-300"
+            className="h-9 px-4 rounded bg-neutral-200 hover:bg-neutral-300 disabled:opacity-60"
             onClick={() => setParams({})}
+            disabled={saving}
           >
             취소
           </button>
           <button
-            className="h-9 px-4 rounded bg-blue-600 text-white hover:bg-blue-500"
-            onClick={() => {
-              onSave({
-                nickname: nickname.trim() || null,
-                avatarUrl: preview,
-                mannerTemp: value.mannerTemp ?? 100, // 👈 초기값 100
-              });
-              setParams({});
-            }}
+            className="h-9 px-4 rounded bg-blue-600 text-white hover:bg-blue-500 disabled:opacity-60"
+            onClick={handleSubmit}
+            disabled={saving}
           >
-            저장
+            {saving ? "저장 중…" : "저장"}
           </button>
         </div>
       </div>
