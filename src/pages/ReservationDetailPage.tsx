@@ -1,4 +1,5 @@
 import { useLocation, useNavigate } from "react-router-dom";
+import { useState } from "react";
 
 type InUseState = {
   spotName: string; // 예: "엘레강스빌"
@@ -16,6 +17,8 @@ type InUseState = {
 export default function ReservationDetailPage() {
   const nav = useNavigate();
   const { state } = useLocation();
+  const [showModal, setShowModal] = useState(false);
+
   const {
     spotName = "주차공간",
     locationLabel = "북문 근처",
@@ -28,6 +31,12 @@ export default function ReservationDetailPage() {
     aiDescription = "쪽문 근처에 위치한 주차 공간입니다. CCTV가 설치되어 있어 안전하며, 주차 공간이 넓고 쾌적합니다. 하지만 이중 주차가 될 가능성이 있으니 시간 여유가 없다면 추천하지 않아요!",
     imageUrl,
   } = (state ?? {}) as InUseState;
+
+  const handleExit = () => {
+    // TODO: 출차 API 연동
+    setShowModal(false);
+    nav(-1); // 출차 후 목록으로 이동
+  };
 
   return (
     <div className="mx-auto grid min-h-dvh w-full max-w-[720px] grid-rows-[auto_1fr_auto] bg-white">
@@ -151,15 +160,68 @@ export default function ReservationDetailPage() {
       <div className="sticky bottom-0 left-0 right-0 mx-auto w-full max-w-[720px] px-2 pb-3 pt-2 bg-zinc-50">
         <button
           type="button"
-          onClick={() => {
-            // TODO: 출차 처리 로직(반납 API) 연결
-            nav(-1);
-          }}
-          className="h-[53px] w-[calc(100%-16px)] translate-x-[8px] rounded-xl bg-blue-500 text-[18px] font-bold text-white"
+          onClick={() => setShowModal(true)} // ← 모달 오픈
+          className="h-[53px] w-[calc(100%-16px)] translate-x-[8px] rounded-xl bg-blue-500 text-[18px] font-bold text-white
+               transition-transform duration-200 hover:scale-[1.01] hover:shadow-lg"
         >
           출차하기
         </button>
       </div>
+      {showModal && (
+        <div className="fixed inset-0 z-50 grid place-items-center bg-black/40 backdrop-blur-sm">
+          {/* 카드 */}
+          <div
+            className="animate-pop w-[380px] max-w-[92vw] rounded-2xl bg-white p-7 shadow-2xl
+                 transition-transform duration-200"
+          >
+            {/* 상단 아이콘 */}
+            <div className="mx-auto mb-3 grid h-12 w-12 place-items-center rounded-full bg-blue-500 text-white">
+              <span className="material-symbols-outlined text-[28px]">
+                warning
+              </span>
+            </div>
+
+            <h2 className="mb-1 text-center text-[18px] font-bold text-gray-900">
+              출차 하시겠습니까?
+            </h2>
+            <p className="mb-5 text-center text-[13px] text-gray-500">
+              출차 후에는 이용 상태가 완료로 변경됩니다.
+            </p>
+
+            <div className="flex items-center justify-center gap-3">
+              {/* 확인 */}
+              <button
+                onClick={handleExit}
+                className="h-11 min-w-[140px] rounded-xl bg-blue-600 px-5 text-[14px] font-semibold text-white
+                     shadow-sm transition-all duration-200
+                     hover:scale-[1.02] hover:shadow-blue-300/50 hover:shadow-lg
+                     active:scale-[0.99]"
+              >
+                예, 출차할게요
+              </button>
+
+              {/* 취소 */}
+              <button
+                onClick={() => setShowModal(false)}
+                className="h-11 min-w-[110px] rounded-xl border border-gray-300 bg-white px-5 text-[14px] font-semibold text-gray-700
+                     transition-all duration-200
+                     hover:scale-[1.02] hover:shadow-md active:scale-[0.99]"
+              >
+                아니오
+              </button>
+            </div>
+          </div>
+
+          {/* 간단한 팝 애니메이션 정의 */}
+          <style>{`
+      @keyframes pop {
+        0% { transform: scale(.98); opacity: 0; }
+        100% { transform: scale(1); opacity: 1; }
+      }
+      .animate-pop { animation: pop .16s ease-out; }
+    `}</style>
+        </div>
+      )}
     </div>
   );
 }
