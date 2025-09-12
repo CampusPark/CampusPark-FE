@@ -13,8 +13,6 @@ export default function SpacesPageStep2() {
   const navigate = useNavigate();
 
   // 4칸 고정 업로드 슬롯
-  // 상태 관리
-  // 업로드 칸에 들어간 파일 상태, 업로드 진행중 여부
   const [files, setFiles] = useState<(File | null)[]>([null, null, null, null]);
   const [isUploading, setIsUploading] = useState(false);
 
@@ -26,13 +24,12 @@ export default function SpacesPageStep2() {
     useRef<HTMLInputElement>(null),
   ];
 
-  // 썸네일 미리보기
+  // 미리보기 URL (object URL)
   const previews = useMemo(
     () => files.map((f) => (f ? URL.createObjectURL(f) : null)),
     [files]
   );
 
-  // 버튼을 클릭하면 input[type="file"] 요소를 클릭
   const onPick = (idx: number) => inputs[idx].current?.click();
 
   const onChange = (idx: number, e: React.ChangeEvent<HTMLInputElement>) => {
@@ -67,12 +64,16 @@ export default function SpacesPageStep2() {
   };
 
   // 실제 업로드 함수(백엔드 엔드포인트에 맞게 수정하세요)
-  // 실제 업로드 함수
+  // 해커톤: 서버 없이 object URL을 로컬 저장
   const uploadImages = async (selected: File[]): Promise<UploadResponse> => {
+    // 이미 previews에 object URL이 있으므로 재생성 없이 selected 기준으로 생성해도 OK
     const objectUrls = selected.map((f) => URL.createObjectURL(f));
 
-    // ✅ 하나의 키로만 저장
-    localStorage.setItem("parking_photos", JSON.stringify(objectUrls));
+    // 👉 운영 전환 시: 서버 업로드 → 실제 이미지 URL 반환받아 저장
+    // const form = new FormData();
+    // selected.forEach((f, i) => form.append("images", f, f.name ?? `image-${i}.jpg`));
+    // const res = await fetch("/api/parking-spaces/images", { method: "POST", body: form });
+    // const { urls } = (await res.json()) as UploadResponse;
 
     return { urls: objectUrls };
   };
@@ -83,11 +84,18 @@ export default function SpacesPageStep2() {
       alert("최소 1장의 사진을 업로드해주세요.");
       return;
     }
+
     try {
       setIsUploading(true);
-      await uploadImages(selected); // 여기서 이미 localStorage에 저장됨
 
-      // 그냥 다음 Step으로 이동
+      // 업로드 (지금은 object URL로 대체)
+      const { urls } = await uploadImages(selected);
+
+      // ✅ 로컬 저장: 사진 배열 + 썸네일(첫 번째 사진)
+      localStorage.setItem("parking_photos", JSON.stringify(urls));
+      localStorage.setItem("parking_thumbnailUrl", urls[0]);
+
+      // 다음 스텝으로 이동
       navigate(ROUTE_PATH.REGISTER_STEP3);
     } catch (e) {
       console.error(e);

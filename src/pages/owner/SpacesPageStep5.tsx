@@ -44,6 +44,7 @@ export default function SpacesPageStep5() {
     // 2) 이전 스텝 값 모으기
     const userId = Number(localStorage.getItem("parking_userId") || "1"); // 필요 시 교체
     const address = localStorage.getItem("parking_address") || "";
+    const name = localStorage.getItem("parking_name") || "";
     const latitude = parseFloat(localStorage.getItem("parking_lat") || "0");
     const longitude = parseFloat(localStorage.getItem("parking_lng") || "0");
     const availableStartTime =
@@ -58,8 +59,12 @@ export default function SpacesPageStep5() {
       localStorage.getItem("parking_price") || "0",
       10
     );
-    const photos =
+
+    // ✅ 사진 & 썸네일 읽기 (Step2에서 저장)
+    const photos: string[] =
       JSON.parse(localStorage.getItem("parking_photos") || "[]") ?? [];
+    let thumbnailUrl =
+      localStorage.getItem("parking_thumbnailUrl") ?? (photos[0] || "");
 
     // 필수값 간단 검증
     if (!address) {
@@ -77,17 +82,26 @@ export default function SpacesPageStep5() {
       navigate(ROUTE_PATH.REGISTER_STEP4);
       return;
     }
+    if (!photos.length) {
+      alert("사진이 없습니다. Step2에서 최소 1장의 사진을 업로드해주세요.");
+      navigate(ROUTE_PATH.REGISTER_STEP2);
+      return;
+    }
+    // 썸네일 누락 시 첫 번째 사진으로 보정
+    if (!thumbnailUrl) thumbnailUrl = photos[0];
 
-    // 3) API 스펙과 동일한 payload (로컬 전용)
+    // 3) API 스펙과 동일한 payload (로컬 전용) + photos/thumbnailUrl 포함
     const payload = {
       address,
+      name,
       latitude,
       longitude,
       availableStartTime, // "YYYY-MM-DDTHH:00:00"
       availableEndTime, // "YYYY-MM-DDTHH:00:00"
       price: finalPrice,
       availableCount,
-      photos, // 로컬 미리보기용 object URL 배열
+      photos, // object URL 배열 (해커톤 임시)
+      thumbnailUrl, // 첫 번째 사진(또는 사용자가 지정한 값)
     };
 
     // 미리보기/테스트용 저장

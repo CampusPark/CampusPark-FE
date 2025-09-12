@@ -8,11 +8,6 @@ import PrimaryButton from "@/components/PrimaryButton";
 import ZipSearchInput from "@/components/ZipSearchInput";
 import { ROUTE_PATH } from "@/routes/paths";
 
-// (지금은 카카오 SDK 안 씀)
-// declare global {
-//   interface Window { kakao: any; }
-// }
-
 export default function SpacesPageStep1() {
   const navigate = useNavigate();
   const [zonecode, setZonecode] = useState("");
@@ -26,22 +21,26 @@ export default function SpacesPageStep1() {
     setTimeout(() => detailRef.current?.focus(), 0);
   };
 
-  // (지금은 사용 안 함)
-  // const geocode = async (address: string) => { ... }
+  const handleNext = () => {
+    const road = roadAddress.trim();
+    const detail = detailAddress.trim();
 
-  const handleNext = async () => {
-    if (!roadAddress.trim() || !detailAddress.trim()) {
+    if (!road || !detail) {
       alert("주소를 모두 입력해주세요.");
       return;
     }
 
-    // ✅ address만 저장 (우편번호 포함/미포함은 취향에 따라)
-    const fullAddress = `${zonecode} ${roadAddress} ${detailAddress}`.trim();
+    // ✅ 우편번호 제외한 주소(API 전송용)
+    const apiAddress = `${road} ${detail}`.trim();
 
-    // 👉 해커톤: localStorage에 임시 저장 (Step5에서 꺼내 POST)
-    localStorage.setItem("parking_address", fullAddress);
+    // 🔹 로컬 저장 정책
+    localStorage.setItem("parking_zonecode", zonecode); // 보관용
+    localStorage.setItem("parking_addressRoad", road); // 도로명
+    localStorage.setItem("parking_addressDetail", detail); // 상세
+    localStorage.setItem("parking_address", apiAddress); // API용(우편번호 제외)
+    localStorage.setItem("parking_name", detail); // 기본 공간명 = 상세주소
 
-    // (위도/경도는 추후 지오코딩 붙일 때 함께 저장)
+    // (위/경도는 나중에 지오코딩 붙일 때 함께 저장)
     // localStorage.setItem("parking_lat", String(lat));
     // localStorage.setItem("parking_lng", String(lng));
 
@@ -64,6 +63,7 @@ export default function SpacesPageStep1() {
               </div>
             </div>
 
+            {/* 주소 입력 */}
             <div className="w-full p-1 flex flex-col justify-center items-start gap-2">
               <div className="inline-flex justify-start items-center gap-2.5">
                 <div className="text-black text-sm font-semibold leading-none">
@@ -93,12 +93,13 @@ export default function SpacesPageStep1() {
                 aria-label="상세 주소"
                 value={detailAddress}
                 onChange={(e) => setDetailAddress(e.target.value)}
-                placeholder="상세 주소 (동·호, 층, 주차구획/진입방법 등)"
+                placeholder="예) 엘레강스빌 101동 1203호 / 지하 1층 12번 구획"
                 required
                 className="w-full h-8 px-2 rounded-lg border border-neutral-300 focus:outline-none"
               />
             </div>
 
+            {/* 지도 미리보기 (더미) */}
             <div className="w-full h-48 p-2.5 bg-neutral-200 rounded-lg flex flex-col justify-center items-center gap-2.5">
               <img src="/assets/map.svg" alt="map icon" className="w-12 h-12" />
               <div className="w-44 h-5 text-neutral-600 text-xs font-semibold leading-none">
