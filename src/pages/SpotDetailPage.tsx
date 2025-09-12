@@ -75,7 +75,7 @@ export default function SpotDetailPage() {
       {/* 기본 정보 카드 */}
       <section className="mx-auto mt-2 w-full max-w-[680px] rounded border border-neutral-300 p-2.5">
         {/* 이름 */}
-        <div className="px-1">
+        <div className="px-0.5 pb-2.5">
           <h1 className="text-[18px] font-semibold leading-7 text-black">
             {data.name}
           </h1>
@@ -93,7 +93,7 @@ export default function SpotDetailPage() {
 
           <button
             type="button"
-            className="rounded-full bg-blue-500 px-2.5 py-2 text-[10px] font-bold leading-7 text-white"
+            className="rounded-full bg-blue-500 px-2.5 py-2 text-[10px] font-bold  text-white"
             // onClick={...} // 시간 상세 모달 등 연결
           >
             이용 가능 시간 상세 보기
