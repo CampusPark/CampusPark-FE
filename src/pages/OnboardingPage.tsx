@@ -71,17 +71,3 @@ export default function OnboardingPage() {
     </div>
   );
 }
-
-// function FeatureRow({ children }: { children: React.ReactNode }) {
-//   return (
-//     <div className="flex items-center gap-3">
-//       <div className="grid h-6 w-6 place-items-center rounded-full bg-blue-500">
-//         {/* 간단 아이콘 대체 */}
-//         <div className="h-2.5 w-2.5 rounded-full bg-white" />
-//       </div>
-//       <span className="text-blue-500 text-base font-bold leading-7">
-//         {children}
-//       </span>
-//     </div>
-//   );
-// }

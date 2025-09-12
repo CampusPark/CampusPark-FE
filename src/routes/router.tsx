@@ -13,8 +13,7 @@ import SearchPage from "@/pages/search/SearchPage";
 import SpotDetailPage from "@/pages/SpotDetailPage";
 import MyPage from "@/pages/MyPage";
 import SpotBookingPage from "@/pages/SpotBookingPage";
-
-const ReservationsPage = () => <div>예약 내역 페이지</div>;
+import ReservationsPage from "@/pages/ReservationsPage";
 
 export default function AppRouter() {
   return (

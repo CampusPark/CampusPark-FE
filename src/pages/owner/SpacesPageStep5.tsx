@@ -22,11 +22,24 @@ export default function SpacesPageStep5() {
   };
 
   // 로컬 히스토리에 누적 저장
-  const pushLocalSubmission = (payload: any) => {
+  type ParkingSubmissionPayload = {
+    address: string;
+    name: string;
+    latitude: number;
+    longitude: number;
+    availableStartTime: string;
+    availableEndTime: string;
+    price: number;
+    availableCount: number;
+    photos: string[];
+    thumbnailUrl: string;
+  };
+
+  const pushLocalSubmission = (payload: ParkingSubmissionPayload) => {
     const KEY = "parking_submissions";
     const list = JSON.parse(localStorage.getItem(KEY) || "[]");
     list.push({
-      id: (globalThis as any).crypto?.randomUUID?.() ?? `local-${Date.now()}`,
+      id: globalThis.crypto?.randomUUID?.() ?? `local-${Date.now()}`,
       createdAt: new Date().toISOString(),
       payload,
     });
