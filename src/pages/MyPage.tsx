@@ -140,7 +140,7 @@ export default function MyPage() {
         <CardButton
           title="내 주차공간 관리"
           subtitle="등록한 공간 관리"
-          onClick={() => nav(ROUTE_PATH.MONITOR)}
+          onClick={() => nav(ROUTE_PATH.MONITOR, { state: { from: "mypage" } })}
           leftIcon={
             <img
               src="/assets/mypage_car.svg"
