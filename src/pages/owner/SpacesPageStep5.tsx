@@ -1,12 +1,12 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
-import axios from "axios"; // ✅ 백엔드 연동/로그 출력을 위해 활성화
 import Header from "@/components/Header";
 import BottomNav from "@/components/layout/BottomNav";
 import ProgressBar from "@/components/ProgressBar";
 import PrimaryButton from "@/components/PrimaryButton";
 import SecondaryButton from "@/components/SecondaryButton";
 import { ROUTE_PATH } from "@/routes/paths";
+import { api } from "@/lib/api"; // API 클라이언트 (axios 인스턴스)
 
 export default function SpacesPageStep5() {
   const navigate = useNavigate();
@@ -124,12 +124,12 @@ export default function SpacesPageStep5() {
     // 실제 API PATH/BASE_URL 은 프로젝트 설정에 맞게 조정하세요.
     try {
       const userId = Number(localStorage.getItem("parking_userId") || "1");
-      const url = `/api/parkingspaces?userId=${userId}`;
+      const url = `/parkingspaces?userId=${userId}`;
 
       console.log("🟦 [SpacesPageStep5] 요청 URL:", url);
       console.log("🟦 [SpacesPageStep5] 요청 Payload:", payload);
 
-      const res = await axios.post(url, payload);
+      const res = await api.post(url, payload);
 
       console.log("🟩 [SpacesPageStep5] 응답 status:", res.status);
       console.log("🟩 [SpacesPageStep5] 응답 headers:", res.headers);
