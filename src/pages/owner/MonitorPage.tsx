@@ -63,9 +63,16 @@ export default function MonitorPage() {
   }, []);
 
   const hasData = submissions.length > 0;
+  const hasBottomNav = !isFromMyPage;
 
   return (
-    <div className="flex-1 flex flex-col items-stretch bg-neutral-50">
+    // ✅ 페이지 전체가 스크롤되도록: min-h-dvh + 필요시 바닥 패딩
+    <div
+      className={[
+        "relative mx-auto min-h-dvh w-full max-w-[720px] bg-neutral-50",
+        hasBottomNav ? "pb-[92px]" : "pb-0", // BottomNav 높이만큼 여백
+      ].join(" ")}
+    >
       {isFromMyPage ? (
         <Header
           title="내 주차 공간 관리"
@@ -88,9 +95,11 @@ export default function MonitorPage() {
         <Header title="내 공간 등록하기" />
       )}
 
-      <div className="w-full px-4 py-1 flex flex-col items-start gap-3 overflow-hidden">
+      {/* ✅ overflow-hidden 제거 */}
+      <div className="w-full px-4 py-1 flex flex-col items-start gap-3">
         {!isFromMyPage && (
-          <div className="w-full inline-flex items-center overflow-hidden">
+          // ✅ 여기서도 overflow-hidden 제거
+          <div className="w-full inline-flex items-center">
             <div className="pt-3 text-black text-base sm:text-lg font-semibold leading-6 sm:leading-7">
               내 주차공간 관리
             </div>
@@ -128,13 +137,14 @@ export default function MonitorPage() {
         )}
       </div>
 
+      {/* 제출 후 CTA 영역 (이건 고정 아님, 페이지 스크롤에 포함) */}
       <div className="w-full pt-2 px-3 sm:px-4 pb-4">
         <PrimaryButton onClick={() => navigate(ROUTE_PATH.REGISTER_STEP1)}>
           내 주차공간 추가하기
         </PrimaryButton>
       </div>
 
-      {!isFromMyPage && <BottomNav />}
+      {hasBottomNav && <BottomNav />}
     </div>
   );
 }
