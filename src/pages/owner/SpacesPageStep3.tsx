@@ -30,18 +30,9 @@ export default function SpacesPageStep3() {
     return h12 === 12 ? 12 : h12 + 12; // 12PM => 12
   };
 
-  // YYYY-MM-DD 문자열 반환
-  const getTodayDateStr = () => {
-    const d = new Date();
-    const yyyy = d.getFullYear();
-    const mm = String(d.getMonth() + 1).padStart(2, "0");
-    const dd = String(d.getDate()).padStart(2, "0");
-    return `${yyyy}-${mm}-${dd}`;
-  };
-
-  // 특정 날짜(YYYY-MM-DD) + 시(0~23) -> ISO-like 문자열
-  const toISOOnDate = (dateStr: string, hour24: number) =>
-    `${dateStr}T${String(hour24).padStart(2, "0")}:00:00`;
+  // 0~23시 -> "HH:00:00"
+  const toHHMMSS = (hour24: number) =>
+    `${String(hour24).padStart(2, "0")}:00:00`;
 
   const handleNext = () => {
     const s = to24h(startPeriod, startHour);
@@ -52,15 +43,12 @@ export default function SpacesPageStep3() {
       return;
     }
 
-    // 기준 날짜: 있으면 사용, 없으면 오늘 날짜
-    const baseDate = localStorage.getItem("parking_date") || getTodayDateStr();
+    // 날짜 제외: 시간만 저장
+    const startTimeOnly = toHHMMSS(s); // "09:00:00"
+    const endTimeOnly = toHHMMSS(e); // "18:00:00"
 
-    // API 스펙(availableStartTime / availableEndTime)에 맞게 저장
-    const startISO = toISOOnDate(baseDate, s);
-    const endISO = toISOOnDate(baseDate, e);
-
-    localStorage.setItem("parking_availableStartTime", startISO);
-    localStorage.setItem("parking_availableEndTime", endISO);
+    localStorage.setItem("parking_availableStartTime", startTimeOnly);
+    localStorage.setItem("parking_availableEndTime", endTimeOnly);
 
     // 표시용 라벨(선택)
     const label = `${startPeriod} ${String(startHour).padStart(2, "0")}:00 ~ ${endPeriod} ${String(endHour).padStart(2, "0")}:00`;
