@@ -97,14 +97,6 @@ export default function SpacesPageStep1() {
           />
         </div>
 
-        {/* 지도 미리보기 (더미) */}
-        <div className="w-full h-48 p-2.5 bg-neutral-200 rounded-lg flex flex-col justify-center items-center gap-2.5">
-          <img src="/assets/map.svg" alt="map icon" className="w-12 h-12" />
-          <div className="w-44 h-5 text-neutral-600 text-xs font-semibold leading-none">
-            주소를 입력하면 위치가 표시됩니다.
-          </div>
-        </div>
-
         <div className="w-full sticky pb-6 bottom-[calc(72px+env(safe-area-inset-bottom))] bg-neutral-50/95 backdrop-blur supports-[backdrop-filter]:bg-neutral-50/80 pt-2">
           <PrimaryButton onClick={handleNext}>다음</PrimaryButton>
         </div>

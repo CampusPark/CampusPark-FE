@@ -39,32 +39,30 @@ export default function HomePage() {
         {/* 지도 자체는 z-10 */}
         <KakaoMap />
 
-        {/* 지도 위 오버레이 영역 (드래그 가능하도록 래퍼는 pointer-events-none) */}
+        {/* 지도 위 오버레이 영역 */}
         <div className="pointer-events-none absolute inset-x-0 top-5 z-20 flex justify-center px-4">
-          {/* 실제 버튼만 클릭 가능하도록 pointer-events-auto */}
           <SearchTrigger
             onClick={() => nav("/search")}
-            className="pointer-events-auto w-5/6"
+            className="pointer-events-auto w-5/6 max-w-[720px]"
           />
         </div>
       </div>
 
       {/* 아래 패널 */}
-      <section className="relative -mt-2 w-full rounded-t-md py-3">
+      <section className="relative -mt-2 w-full rounded-t-md px-2 sm:px-3 py-3">
         {/* 섹션 타이틀 */}
-        <h2 className="mt-8 m-4 text-[16px] font-bold leading-4 text-black">
+        <h2 className="mx-auto mt-6 mb-2 w-full max-w-[700px] px-1 text-[16px] sm:text-[18px] font-bold text-black">
           근처 주차 공간
         </h2>
 
         {/* 리스트 */}
-        <div className="grid gap-3">
+        <div className="mx-auto w-full max-w-[700px] grid gap-3 px-1">
           {dummySpots.map((s) => (
             <SpotCard key={s.id} spot={s} />
           ))}
         </div>
       </section>
 
-      {/* 선택적: 스페이서 대신 컨테이너 pb-24로 처리 */}
       <BottomNav />
     </div>
   );
@@ -75,44 +73,51 @@ function SpotCard({ spot }: { spot: Spot }) {
   return (
     <Link
       to={to}
-      className="flex h-[90px] mx-auto w-full max-w-[680px] items-center gap-2 rounded-lg bg-white p-1 shadow-[0_0_8px_rgba(0,0,0,0.25)]
-                 hover:shadow-[0_2px_12px_rgba(0,0,0,0.18)] transition-shadow
-                 focus:outline-none focus:ring-2 focus:ring-blue-500"
+      className={[
+        "flex w-full max-w-[680px] items-center gap-2 rounded-lg bg-white",
+        "p-2 sm:p-3 mx-auto",
+        "shadow-sm hover:shadow-md transition-shadow",
+        "focus:outline-none focus:ring-2 focus:ring-blue-500",
+      ].join(" ")}
       aria-label={`${spot.name} 상세로 이동`}
     >
-      <div className="h-20 w-[98px] rounded-lg bg-orange-50" />
-      <div className="flex h-[74px] flex-col items-start justify-center gap-1 p-1">
-        <p className="text-[20px] font-bold leading-4 text-black">
+      {/* 썸네일 */}
+      <div className="overflow-hidden rounded-lg bg-orange-50 flex-shrink-0 w-20 h-20 sm:w-24 sm:h-24">
+        {spot.image ? (
+          <img
+            src={spot.image}
+            alt={`${spot.name} 썸네일`}
+            className="h-full w-full object-cover"
+            loading="lazy"
+          />
+        ) : null}
+      </div>
+
+      {/* 텍스트 영역 */}
+      <div className="flex min-w-0 flex-col items-start justify-center gap-1 p-1">
+        <p className="truncate text-base sm:text-[18px] md:text-[20px] font-semibold leading-6 sm:leading-7 text-black">
           {spot.name}
         </p>
 
         <div className="flex items-center gap-1">
-          <span className="text-[15px] font-bold leading-4 text-blue-500">
-            {spot.pricePoint}P
+          <span className="text-sm font-bold leading-5 sm:leading-6 text-blue-500">
+            {spot.pricePoint.toLocaleString()}P
           </span>
-          <span className="text-[12px] font-semibold leading-4 text-neutral-600">
+          <span className="text-xs font-semibold leading-5 sm:leading-6 text-neutral-600">
             {spot.unit}
           </span>
         </div>
 
-        <div className="flex items-center gap-1 py-1 pr-1">
-          <svg
-            width="12"
-            height="12"
-            viewBox="0 0 24 24"
-            className="text-amber-500"
-          >
-            <path
-              fill="#FFA629"
-              d="M13 15.1V5a1 1 0 10-2 0v10.1a3.5 3.5 0 102 0z"
-            />
-          </svg>
-          <span className="text-[10px] font-semibold leading-4 text-amber-500">
+        <div className="flex items-center gap-2 py-1 pr-1">
+          <img
+            src="/assets/mypage_temperature.svg"
+            alt="temperature icon"
+            className="w-5 h-5"
+          />
+          <span className="text-xs font-semibold text-amber-500">
             {spot.manner}
           </span>
-          <span className="text-[10px] font-semibold leading-4 text-gray-500">
-            매너 온도
-          </span>
+          <span className="text-xs font-medium  text-gray-500">매너 온도</span>
         </div>
       </div>
     </Link>
