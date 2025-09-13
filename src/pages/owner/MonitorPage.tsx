@@ -1,11 +1,10 @@
 import React from "react";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useLocation } from "react-router-dom";
 import ParkingSpaceCard from "@/components/ParkingSpaceCard";
 import PrimaryButton from "@/components/PrimaryButton";
 import Header from "@/components/Header";
 import BottomNav from "@/components/layout/BottomNav";
 import { ROUTE_PATH } from "@/routes/paths";
-import { useLocation } from "react-router-dom";
 
 type LocalSubmission = {
   id: string;
@@ -50,8 +49,13 @@ function buildCardProps(p: LocalSubmission["payload"]) {
 
 export default function MonitorPage() {
   const navigate = useNavigate();
-  const { pathname } = useLocation();
-  const isFromMyPage = pathname.startsWith("/mypage");
+  const location = useLocation();
+
+  const params = new URLSearchParams(location.search);
+  const isFromMyPage =
+    location.state?.from === "mypage" ||
+    params.get("from") === "mypage" ||
+    location.pathname.startsWith(ROUTE_PATH.MYPAGE);
 
   const submissions = React.useMemo<LocalSubmission[]>(() => {
     try {
@@ -75,25 +79,32 @@ export default function MonitorPage() {
         <Header
           title="내 주차 공간 관리"
           left={
-            <img
-              src="/assets/goBackButtonImg.svg"
-              alt="뒤로 가기"
-              className="w-6 h-6"
-            />
+            <button
+              type="button"
+              onClick={() => navigate(-1)}
+              aria-label="뒤로 가기"
+              className="w-6 h-6 inline-flex items-center justify-center"
+            >
+              <img
+                src="/assets/goBackButtonImg.svg"
+                alt=""
+                className="w-6 h-6"
+              />
+            </button>
           }
         />
       ) : (
         <Header title="내 공간 등록하기" />
       )}
 
-      <div className="w-full px-4 sm:px-4 py-1 flex flex-col justify-center items-start gap-3 overflow-hidden">
-        <div className="w-full inline-flex justify-start items-center gap-2.5 overflow-hidden">
-          <div className="flex justify-start items-center gap-2.5 overflow-hidden">
-            <div className="text-black pt-3 text-base sm:text-lg font-semibold leading-6 sm:leading-7">
+      <div className="w-full px-4 py-1 flex flex-col items-start gap-3 overflow-hidden">
+        {!isFromMyPage && (
+          <div className="w-full inline-flex items-center overflow-hidden">
+            <div className="pt-3 text-black text-base sm:text-lg font-semibold leading-6 sm:leading-7">
               내 주차공간 관리
             </div>
           </div>
-        </div>
+        )}
 
         {/* 저장된 주차공간 목록 */}
         {hasData ? (
