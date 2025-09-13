@@ -124,7 +124,7 @@ export default function SpacesPageStep5() {
     // 실제 API PATH/BASE_URL 은 프로젝트 설정에 맞게 조정하세요.
     try {
       const userId = Number(localStorage.getItem("parking_userId") || "1");
-      const url = `/parkingspaces?userId=${userId}`;
+      const url = `/parking-spaces?userId=${userId}`;
 
       console.log("🟦 [SpacesPageStep5] 요청 URL:", url);
       console.log("🟦 [SpacesPageStep5] 요청 Payload:", payload);

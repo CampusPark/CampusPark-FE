@@ -10,41 +10,33 @@ type LocalSubmission = {
   id: string;
   createdAt: string;
   payload: {
-    address: string;
-    name?: string; // Step1 저장값 (없으면 카드에서 기본값 사용)
+    /** 그대로 사용 */
+    name?: string; // 카드 이름(없으면 기본값)
+    address: string; // 위치
+    price: number; // 포인트(가격)
+    available_hours?: string; // "평일 09:00 - 18:00" 등, 그대로 출력
+    /** 레거시 호환(과거 단계 저장값) */
+    availableStartTime?: string; // "YYYY-MM-DDTHH:00:00"
+    availableEndTime?: string; // "YYYY-MM-DDTHH:00:00"
+    /** 기타 */
     latitude: number;
     longitude: number;
-    availableStartTime: string; // "YYYY-MM-DDTHH:00:00"
-    availableEndTime: string; // "YYYY-MM-DDTHH:00:00"
-    price: number;
     availableCount: number;
-    photos?: string[]; // Step2 저장값
-    thumbnailUrl?: string; // Step2에서 선택/자동지정 값(없으면 photos[0] 사용)
+    photos?: string[];
+    thumbnailUrl?: string;
   };
 };
 
-function toHHmm(iso: string) {
-  const d = new Date(iso);
-  const hh = String(d.getHours()).padStart(2, "0");
-  const mm = String(d.getMinutes()).padStart(2, "0");
-  return `${hh}:${mm}`;
-}
-
+// payload의 필드명을 그대로 카드 props로 매핑
 function buildCardProps(p: LocalSubmission["payload"]) {
-  const name =
-    p.address?.split(" ").slice(0, 2).join(" ")?.concat(" 주차공간") ||
-    "내 주차공간";
-  const location = p.address || "주소 미입력";
-  const points = Number.isFinite(p.price) ? p.price : 0;
-  const timeWindow =
-    p.availableStartTime && p.availableEndTime
-      ? `${toHHmm(p.availableStartTime)} ~ ${toHHmm(p.availableEndTime)}`
-      : "시간 미설정";
-
-  const photos = p.photos ?? [];
-  const thumbnailUrl = p.thumbnailUrl || photos[0] || "";
-
-  return { name, location, points, timeWindow, photos, thumbnailUrl };
+  return {
+    name: p.name ?? "내 주차공간",
+    location: p.address ?? "주소 미입력",
+    points: Number.isFinite(p.price) ? p.price : 0,
+    timeWindow: p.available_hours ?? "시간 미설정",
+    photos: p.photos ?? [],
+    thumbnailUrl: p.thumbnailUrl || p.photos?.[0] || "",
+  };
 }
 
 export default function MonitorPage() {
@@ -61,7 +53,6 @@ export default function MonitorPage() {
     try {
       const raw = localStorage.getItem("parking_submissions");
       const arr = raw ? (JSON.parse(raw) as LocalSubmission[]) : [];
-      // 최신순
       return arr.sort(
         (a, b) =>
           new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
@@ -72,9 +63,16 @@ export default function MonitorPage() {
   }, []);
 
   const hasData = submissions.length > 0;
+  const hasBottomNav = !isFromMyPage;
 
   return (
-    <div className="flex-1 flex flex-col items-stretch bg-neutral-50">
+    // ✅ 페이지 전체가 스크롤되도록: min-h-dvh + 필요시 바닥 패딩
+    <div
+      className={[
+        "relative mx-auto min-h-dvh w-full max-w-[720px] bg-neutral-50",
+        hasBottomNav ? "pb-[92px]" : "pb-0", // BottomNav 높이만큼 여백
+      ].join(" ")}
+    >
       {isFromMyPage ? (
         <Header
           title="내 주차 공간 관리"
@@ -97,9 +95,11 @@ export default function MonitorPage() {
         <Header title="내 공간 등록하기" />
       )}
 
-      <div className="w-full px-4 py-1 flex flex-col items-start gap-3 overflow-hidden">
+      {/* ✅ overflow-hidden 제거 */}
+      <div className="w-full px-4 py-1 flex flex-col items-start gap-3">
         {!isFromMyPage && (
-          <div className="w-full inline-flex items-center overflow-hidden">
+          // ✅ 여기서도 overflow-hidden 제거
+          <div className="w-full inline-flex items-center">
             <div className="pt-3 text-black text-base sm:text-lg font-semibold leading-6 sm:leading-7">
               내 주차공간 관리
             </div>
@@ -137,13 +137,14 @@ export default function MonitorPage() {
         )}
       </div>
 
+      {/* 제출 후 CTA 영역 (이건 고정 아님, 페이지 스크롤에 포함) */}
       <div className="w-full pt-2 px-3 sm:px-4 pb-4">
         <PrimaryButton onClick={() => navigate(ROUTE_PATH.REGISTER_STEP1)}>
           내 주차공간 추가하기
         </PrimaryButton>
       </div>
 
-      {!isFromMyPage && <BottomNav />}
+      {hasBottomNav && <BottomNav />}
     </div>
   );
 }
