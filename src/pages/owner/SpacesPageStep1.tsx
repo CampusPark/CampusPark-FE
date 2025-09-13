@@ -1,4 +1,3 @@
-// SpacesPageStep1.tsx
 import { useState, useRef } from "react";
 import { useNavigate } from "react-router-dom";
 import Header from "@/components/Header";
@@ -8,11 +7,51 @@ import PrimaryButton from "@/components/PrimaryButton";
 import ZipSearchInput from "@/components/ZipSearchInput";
 import { ROUTE_PATH } from "@/routes/paths";
 
+const KAKAO_REST_KEY = import.meta.env.VITE_KAKAO_REST_KEY as string;
+
+/** 카카오 주소검색 REST API로 지오코딩(주소 -> 위경도) */
+async function geocodeByKakao(
+  address: string
+): Promise<{ lat: number; lng: number } | null> {
+  if (!KAKAO_REST_KEY) {
+    console.warn("Kakao REST key is missing. Set VITE_KAKAO_REST_KEY in .env");
+    return null;
+  }
+
+  const url = `https://dapi.kakao.com/v2/local/search/address.json?query=${encodeURIComponent(
+    address
+  )}`;
+
+  const res = await fetch(url, {
+    headers: {
+      Authorization: `KakaoAK ${KAKAO_REST_KEY}`,
+      "Content-Type": "application/json",
+    },
+  });
+
+  if (!res.ok) {
+    console.error("Kakao geocode failed:", res.status, await res.text());
+    return null;
+  }
+
+  const data = await res.json();
+  const doc = data?.documents?.[0];
+  if (!doc) return null;
+
+  // Kakao: x = lng, y = lat
+  const lng = Number(doc.x);
+  const lat = Number(doc.y);
+  if (Number.isNaN(lat) || Number.isNaN(lng)) return null;
+
+  return { lat, lng };
+}
+
 export default function SpacesPageStep1() {
   const navigate = useNavigate();
   const [zonecode, setZonecode] = useState("");
   const [roadAddress, setRoadAddress] = useState("");
   const [detailAddress, setDetailAddress] = useState("");
+  const [loading, setLoading] = useState(false);
   const detailRef = useRef<HTMLInputElement>(null);
 
   const handleZipChange = (addr: { zonecode: string; roadAddress: string }) => {
@@ -21,7 +60,7 @@ export default function SpacesPageStep1() {
     setTimeout(() => detailRef.current?.focus(), 0);
   };
 
-  const handleNext = () => {
+  const handleNext = async () => {
     const road = roadAddress.trim();
     const detail = detailAddress.trim();
 
@@ -30,21 +69,39 @@ export default function SpacesPageStep1() {
       return;
     }
 
-    // ✅ 우편번호 제외한 주소(API 전송용)
+    // ✅ 우편번호 제외한 주소(API 전송 + 지오코딩용)
     const apiAddress = `${road} ${detail}`.trim();
 
-    // 🔹 로컬 저장 정책
-    localStorage.setItem("parking_zonecode", zonecode); // 보관용
-    localStorage.setItem("parking_addressRoad", road); // 도로명
-    localStorage.setItem("parking_addressDetail", detail); // 상세
-    localStorage.setItem("parking_address", apiAddress); // API용(우편번호 제외)
-    localStorage.setItem("parking_name", detail); // 기본 공간명 = 상세주소
+    try {
+      setLoading(true);
 
-    // (위/경도는 나중에 지오코딩 붙일 때 함께 저장)
-    // localStorage.setItem("parking_lat", String(lat));
-    // localStorage.setItem("parking_lng", String(lng));
+      // 🔎 지오코딩 수행 (프런트에서 주소 -> 위경도)
+      const coords = await geocodeByKakao(apiAddress);
 
-    navigate(ROUTE_PATH.REGISTER_STEP2);
+      if (!coords) {
+        alert("주소 좌표를 찾을 수 없습니다. 주소를 다시 확인해주세요.");
+        return;
+      }
+
+      // 🔹 로컬 저장 정책
+      localStorage.setItem("parking_zonecode", zonecode); // 보관용
+      localStorage.setItem("parking_addressRoad", road); // 도로명
+      localStorage.setItem("parking_addressDetail", detail); // 상세
+      localStorage.setItem("parking_address", apiAddress); // API용(우편번호 제외)
+      localStorage.setItem("parking_name", detail); // 기본 공간명 = 상세주소
+
+      // ✅ 위/경도 저장
+      localStorage.setItem("parking_lat", String(coords.lat));
+      localStorage.setItem("parking_lng", String(coords.lng));
+
+      // 다음 스텝
+      navigate(ROUTE_PATH.REGISTER_STEP2);
+    } catch (err) {
+      console.error(err);
+      alert("좌표 변환 중 오류가 발생했습니다. 잠시 후 다시 시도해주세요.");
+    } finally {
+      setLoading(false);
+    }
   };
 
   return (
@@ -98,7 +155,9 @@ export default function SpacesPageStep1() {
         </div>
 
         <div className="w-full sticky pb-6 bottom-[calc(72px+env(safe-area-inset-bottom))] bg-neutral-50/95 backdrop-blur supports-[backdrop-filter]:bg-neutral-50/80 pt-2">
-          <PrimaryButton onClick={handleNext}>다음</PrimaryButton>
+          <PrimaryButton onClick={handleNext} disabled={loading}>
+            {loading ? "좌표 변환 중..." : "다음"}
+          </PrimaryButton>
         </div>
       </div>
 

@@ -11,6 +11,8 @@ type Spot = {
   unit: string; // "/시간"
   manner: string; // "85°C"
   image?: string;
+  latitude: number;
+  longitude: number;
 };
 
 const dummySpots: Spot[] = [
@@ -20,24 +22,47 @@ const dummySpots: Spot[] = [
     pricePoint: 2500,
     unit: "/시간",
     manner: "85°C",
+    latitude: 35.8906,
+    longitude: 128.612,
   },
   {
     id: "2",
-    name: "엘레강스 빌",
-    pricePoint: 2500,
+    name: "에코 주차장",
+    pricePoint: 1500,
     unit: "/시간",
-    manner: "85°C",
+    manner: "82°C",
+    latitude: 35.8912,
+    longitude: 128.614,
   },
 ];
 
 export default function HomePage() {
   const nav = useNavigate();
 
+  // 마커 변환
+  const markers = dummySpots.map((s) => ({
+    id: s.id,
+    lat: s.latitude,
+    lng: s.longitude,
+    title: `${s.name} · ${s.pricePoint.toLocaleString()}P`,
+  }));
+
   return (
     <div className="relative min-h-dvh w-full bg-zinc-50 pb-24">
       <div className="relative">
         {/* 지도 자체는 z-10 */}
-        <KakaoMap />
+        <KakaoMap
+          center={{
+            lat: dummySpots[0].latitude,
+            lng: dummySpots[0].longitude,
+          }}
+          level={4}
+          markers={markers}
+          onMarkerClick={(m) => {
+            // 마커 클릭 시 해당 Spot 상세로 이동
+            nav(generatePath(ROUTE_PATH.SPOT_DETAIL, { id: m.id }));
+          }}
+        />
 
         {/* 지도 위 오버레이 영역 */}
         <div className="pointer-events-none absolute inset-x-0 top-5 z-20 flex justify-center px-4">
@@ -50,12 +75,10 @@ export default function HomePage() {
 
       {/* 아래 패널 */}
       <section className="relative -mt-2 w-full rounded-t-md px-2 sm:px-3 py-3">
-        {/* 섹션 타이틀 */}
         <h2 className="mx-auto mt-6 mb-2 w-full max-w-[700px] px-1 text-[16px] sm:text-[18px] font-bold text-black">
           근처 주차 공간
         </h2>
 
-        {/* 리스트 */}
         <div className="mx-auto w-full max-w-[700px] grid gap-3 px-1">
           {dummySpots.map((s) => (
             <SpotCard key={s.id} spot={s} />
@@ -81,7 +104,6 @@ function SpotCard({ spot }: { spot: Spot }) {
       ].join(" ")}
       aria-label={`${spot.name} 상세로 이동`}
     >
-      {/* 썸네일 */}
       <div className="overflow-hidden rounded-lg bg-orange-50 flex-shrink-0 w-20 h-20 sm:w-24 sm:h-24">
         {spot.image ? (
           <img
@@ -93,7 +115,6 @@ function SpotCard({ spot }: { spot: Spot }) {
         ) : null}
       </div>
 
-      {/* 텍스트 영역 */}
       <div className="flex min-w-0 flex-col items-start justify-center gap-1 p-1">
         <p className="truncate text-base sm:text-[18px] md:text-[20px] font-semibold leading-6 sm:leading-7 text-black">
           {spot.name}
@@ -117,7 +138,7 @@ function SpotCard({ spot }: { spot: Spot }) {
           <span className="text-xs font-semibold text-amber-500">
             {spot.manner}
           </span>
-          <span className="text-xs font-medium  text-gray-500">매너 온도</span>
+          <span className="text-xs font-medium text-gray-500">매너 온도</span>
         </div>
       </div>
     </Link>
