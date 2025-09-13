@@ -1,7 +1,9 @@
 import { useMemo, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import BottomNav from "@/components/layout/BottomNav";
+import ParkingSpaceCard from "@/components/ParkingSpaceCard"; // ✅ 추가
 import { ROUTE_PATH } from "@/routes/paths";
+import Header from "@/components/Header";
 
 type Reservation = {
   id: string;
@@ -50,6 +52,17 @@ function fmtDateK(dateISO?: string) {
   return `${yyyy}.${mm}.${dd} (${day}요일)`;
 }
 
+/** Reservation → ParkingSpaceCard props 매핑 */
+function toPsCardProps(r: Reservation) {
+  return {
+    name: r.spotName,
+    location: r.locationLabel,
+    points: r.pricePoint,
+    timeWindow: `${r.start} ~ ${r.end}`,
+    thumbnailUrl: r.heroUrl,
+  } as const;
+}
+
 export default function ReservationsPage() {
   const nav = useNavigate();
   const [tab, setTab] = useState<"ACTIVE" | "DONE">("ACTIVE");
@@ -57,38 +70,32 @@ export default function ReservationsPage() {
   const list = useMemo(() => MOCK.filter((r) => r.status === tab), [tab]);
 
   return (
-    <div className="mx-auto min-h-dvh w-full max-w-[720px] bg-zinc-50 pb-[92px]">
-      {/* 헤더 */}
-      <header className="sticky top-0 z-10 flex h-[51px] items-center justify-between border-b border-zinc-300 bg-white px-3">
-        <div className="h-6 w-6" />
-        <h1 className="text-[18px] font-semibold leading-7 text-black">
-          예약 내역
-        </h1>
-        <div className="h-6 w-6" />
-      </header>
-
-      {/* 탭 */}
-      <div className="mx-auto mt-2 flex w-[700px] items-center gap-2 rounded-[24px] bg-neutral-100 p-1">
-        <button
-          type="button"
-          onClick={() => setTab("ACTIVE")}
-          className={[
-            "h-[33px] flex-1 rounded-[24px] text-center text-[12px] font-medium",
-            tab === "ACTIVE" ? "bg-white text-blue-600" : "text-neutral-600",
-          ].join(" ")}
-        >
-          이용중
-        </button>
-        <button
-          type="button"
-          onClick={() => setTab("DONE")}
-          className={[
-            "h-[33px] flex-1 rounded-[24px] text-center text-[12px] font-medium",
-            tab === "DONE" ? "bg-white text-blue-600" : "text-neutral-600",
-          ].join(" ")}
-        >
-          이용 완료
-        </button>
+    <div className="flex-1 flex flex-col items-stretch bg-neutral-50">
+      <Header title="예약 내역" />
+      <div className="w-full px-4 py-1 flex flex-col justify-center items-start gap-1]">
+        {/* 탭 바 */}
+        <div className="mx-auto flex w-full items-center gap-2 rounded-[24px] bg-neutral-100 p-1">
+          <button
+            type="button"
+            onClick={() => setTab("ACTIVE")}
+            className={[
+              "h-[33px] flex-1 rounded-[24px] text-center text-[12px] font-medium",
+              tab === "ACTIVE" ? "bg-white text-blue-600" : "text-neutral-600",
+            ].join(" ")}
+          >
+            이용중
+          </button>
+          <button
+            type="button"
+            onClick={() => setTab("DONE")}
+            className={[
+              "h-[33px] flex-1 rounded-[24px] text-center text-[12px] font-medium",
+              tab === "DONE" ? "bg-white text-blue-600" : "text-neutral-600",
+            ].join(" ")}
+          >
+            이용 완료
+          </button>
+        </div>
       </div>
 
       {/* 리스트 */}
@@ -101,15 +108,16 @@ export default function ReservationsPage() {
 
         {list.map((item) =>
           item.status === "ACTIVE" ? (
-            <ActiveCard
+            <ActiveReservationCard
               key={item.id}
               data={item}
-              onClick={() =>
-                nav(ROUTE_PATH.RESERVATION_DETAIL.replace(":id", "1"))
+              onClick={
+                () => nav(ROUTE_PATH.RESERVATION_DETAIL.replace(":id", item.id)) // ✅ 실제 id 사용
               }
+              // remainingMinutes={calcRemainingMinutes(item)} // 필요하면 계산로직 연결
             />
           ) : (
-            <DoneCard key={item.id} data={item} />
+            <DoneReservationCard key={item.id} data={item} />
           )
         )}
       </main>
@@ -119,134 +127,82 @@ export default function ReservationsPage() {
   );
 }
 
-/* -------------------- Active Card -------------------- */
+/* -------------------- 래퍼 카드들 -------------------- */
 
-function ActiveCard({
+/** 이용중 카드: ParkingSpaceCard 재사용 + 남은시간 배지 */
+function ActiveReservationCard({
   data,
   onClick,
+  remainingMinutes = 45, // 임시값. 실제로는 종료시각/현재시각으로 계산해 넣어도 됨
 }: {
   data: Reservation;
   onClick?: () => void;
+  remainingMinutes?: number;
 }) {
-  return (
-    <article
-      className="flex h-[130px] w-full cursor-pointer items-start gap-1 rounded-lg bg-white p-2"
-      onClick={onClick}
-    >
-      {/* 썸네일 */}
-      <div className="relative h-[110px] w-[104px] overflow-hidden rounded-lg bg-amber-100">
-        {data.heroUrl ? (
-          <img
-            src={data.heroUrl}
-            alt={data.spotName}
-            className="h-full w-full object-cover"
-          />
-        ) : null}
-      </div>
+  const ps = toPsCardProps(data);
 
-      {/* 내용 */}
-      <div className="flex w-full max-w-[560px] flex-col justify-center gap-1 px-1 pb-2 pr-2">
-        {/* 타이틀 / 남은시간 배지 */}
-        <div className="flex items-center justify-between">
-          <div className="text-[16px] font-semibold text-black">
-            {data.spotName}
-          </div>
-          <span className="rounded-[12px] border border-green-500 bg-green-100 px-1.5 py-2 text-[10px] font-semibold leading-3 text-green-500">
-            45분 남음
+  return (
+    <div className="relative">
+      <ParkingSpaceCard
+        {...ps}
+        remainingMinutes={remainingMinutes}
+        onClick={onClick}
+      />
+    </div>
+  );
+}
+
+/** 완료 카드: ParkingSpaceCard 재사용 + 완료 전용 정보 블록 */
+function DoneReservationCard({ data }: { data: Reservation }) {
+  const ps = toPsCardProps(data);
+
+  return (
+    <div className="relative">
+      {/* 우상단 배지 */}
+      <span className="absolute right-2 top-2 rounded-lg border border-blue-600 bg-blue-100 px-2 py-1 text-[10px] font-semibold leading-3 text-blue-600">
+        반납 완료
+      </span>
+
+      <ParkingSpaceCard {...ps} />
+
+      {/* 완료 전용 하단 섹션 */}
+      <div className="mt-1 rounded border border-neutral-200 bg-white px-2 py-2">
+        {/* 날짜 */}
+        <div className="flex items-center gap-2">
+          <span className="text-[10px] font-medium leading-4 text-neutral-500">
+            {fmtDateK(data.returnedAt)}
           </span>
         </div>
 
-        {/* 위치 */}
-        <RowIconText text={data.locationLabel} />
+        {/* 이용 시간 + 상세보기 버튼 */}
+        <div className="mt-1 flex items-center gap-2">
+          <span className="text-[12px] font-semibold leading-7 text-neutral-500">
+            시간
+          </span>
+          <span className="text-[12px] font-semibold leading-7 text-black">
+            {data.start}~{data.end} 이용 가능
+          </span>
+          <button
+            type="button"
+            className="ml-2 rounded-[12px] bg-blue-500 px-2 py-2 text-[9px] font-bold text-white"
+          >
+            이용 가능 시간 상세 보기
+          </button>
+        </div>
 
-        {/* 시간 */}
-        <RowIconText text={`${data.start} ~ ${data.end}`} />
-
-        {/* 포인트 */}
-        <div className="flex items-center gap-1 px-1">
-          <i className="inline-block h-3 w-3 rounded-[2px] bg-neutral-600" />
-          <span className="text-[12px] font-semibold leading-[14px] text-blue-500">
+        {/* 포인트(/시간) */}
+        <div className="mt-1 flex items-center gap-2">
+          <span className="text-[12px] font-semibold leading-7 text-neutral-500">
+            포인트
+          </span>
+          <span className="text-[12px] font-semibold leading-7 text-blue-500">
             {data.pricePoint.toLocaleString()}P
           </span>
+          <span className="text-[8px] font-semibold leading-7 text-neutral-500">
+            /시간
+          </span>
         </div>
       </div>
-    </article>
-  );
-}
-
-/* -------------------- Done Card -------------------- */
-
-function DoneCard({ data }: { data: Reservation }) {
-  return (
-    <article className="flex w-full flex-col items-center gap-1 rounded border border-neutral-300 bg-white p-2">
-      {/* 제목 + 반납 완료 배지 */}
-      <div className="flex h-[25px] w-full items-center gap-5 px-1">
-        <div className="flex-1 text-[18px] font-semibold leading-7 text-black">
-          {data.spotName}
-        </div>
-        <span className="rounded-lg border border-blue-600 bg-blue-100 px-2 py-1 text-[10px] font-semibold leading-3 text-blue-600">
-          반납 완료
-        </span>
-      </div>
-
-      {/* 날짜 */}
-      <div className="flex h-[17px] w-full items-center gap-2 px-1">
-        <span className="text-[10px] font-medium leading-4 text-neutral-500">
-          {fmtDateK(data.returnedAt)}
-        </span>
-      </div>
-
-      {/* 위치 */}
-      <div className="flex h-[26px] w-full items-center gap-2 px-1">
-        <span className="text-[12px] font-semibold leading-7 text-neutral-500">
-          위치
-        </span>
-        <span className="text-[12px] font-semibold leading-7 text-black">
-          {data.locationLabel}
-        </span>
-      </div>
-
-      {/* 시간 */}
-      <div className="flex h-[26px] w-full items-center gap-2 px-1">
-        <span className="text-[12px] font-semibold leading-7 text-neutral-500">
-          시간
-        </span>
-        <span className="text-[12px] font-semibold leading-7 text-black">
-          {data.start}~{data.end} 이용 가능
-        </span>
-        <button
-          type="button"
-          className="ml-2 rounded-[12px] bg-blue-500 px-2 py-2 text-[9px] font-bold text-white"
-        >
-          이용 가능 시간 상세 보기
-        </button>
-      </div>
-
-      {/* 포인트 */}
-      <div className="flex h-[26px] w-full items-center gap-2 px-1">
-        <span className="text-[12px] font-semibold leading-7 text-neutral-500">
-          포인트
-        </span>
-        <span className="text-[12px] font-semibold leading-7 text-blue-500">
-          {data.pricePoint.toLocaleString()}P
-        </span>
-        <span className="text-[8px] font-semibold leading-7 text-neutral-500">
-          /시간
-        </span>
-      </div>
-    </article>
-  );
-}
-
-/* -------------------- Small UI helpers -------------------- */
-
-function RowIconText({ text }: { text: string }) {
-  return (
-    <div className="flex items-center gap-1 px-1">
-      <i className="inline-block h-3 w-3 rounded-[2px] bg-neutral-600" />
-      <span className="text-[12px] font-medium leading-7 text-neutral-600">
-        {text}
-      </span>
     </div>
   );
 }
