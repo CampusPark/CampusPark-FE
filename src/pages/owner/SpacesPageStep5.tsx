@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
-// import axios from "axios"; // ❌ 지금은 백엔드 미연동이므로 주석
+import axios from "axios"; // ✅ 백엔드 연동/로그 출력을 위해 활성화
 import Header from "@/components/Header";
 import BottomNav from "@/components/layout/BottomNav";
 import ProgressBar from "@/components/ProgressBar";
@@ -55,7 +55,6 @@ export default function SpacesPageStep5() {
     localStorage.setItem("parking_price", String(price));
 
     // 2) 이전 스텝 값 모으기
-    // const userId = Number(localStorage.getItem("parking_userId") || "1"); // 필요 시 교체
     const address = localStorage.getItem("parking_address") || "";
     const name = localStorage.getItem("parking_name") || "";
     const latitude = parseFloat(localStorage.getItem("parking_lat") || "0");
@@ -104,7 +103,7 @@ export default function SpacesPageStep5() {
     if (!thumbnailUrl) thumbnailUrl = photos[0];
 
     // 3) API 스펙과 동일한 payload (로컬 전용) + photos/thumbnailUrl 포함
-    const payload = {
+    const payload: ParkingSubmissionPayload = {
       address,
       name, // address 에서 상세주소 값(빌라, 건물 이름)추출 -> 공간 카드 랜더링 용이
       latitude,
@@ -113,7 +112,7 @@ export default function SpacesPageStep5() {
       availableEndTime, // "YYYY-MM-DDTHH:00:00"
       price: finalPrice,
       availableCount,
-      photos, // object URL 배열 (해커톤 임시)
+      photos, // (해커톤 임시) object URL 배열
       thumbnailUrl, // 첫 번째 사진(또는 사용자가 지정한 값)
     };
 
@@ -121,22 +120,62 @@ export default function SpacesPageStep5() {
     localStorage.setItem("parking_lastPayload", JSON.stringify(payload));
     pushLocalSubmission(payload);
 
-    // 4) 백엔드 요청은 지금 주석
-    // try {
-    //   const res = await axios.post(`/api/parkingspaces?userId=${userId}`, payload);
-    //   if (res.status === 201) {
-    //     navigate(ROUTE_PATH.MONITOR);
-    //     return;
-    //   } else {
-    //     alert("등록에 실패했습니다. 잠시 후 다시 시도해주세요.");
-    //   }
-    // } catch (e) {
-    //   console.error(e);
-    //   alert("서버와 통신 중 오류가 발생했습니다.");
-    // }
+    // 4) 백엔드 요청 + 응답을 콘솔에 출력
+    // 실제 API PATH/BASE_URL 은 프로젝트 설정에 맞게 조정하세요.
+    try {
+      const userId = Number(localStorage.getItem("parking_userId") || "1");
+      const url = `/api/parkingspaces?userId=${userId}`;
 
-    // 5) 바로 완료 화면(테스트 페이지)로 이동
-    navigate(ROUTE_PATH.MONITOR);
+      console.log("🟦 [SpacesPageStep5] 요청 URL:", url);
+      console.log("🟦 [SpacesPageStep5] 요청 Payload:", payload);
+
+      const res = await axios.post(url, payload);
+
+      console.log("🟩 [SpacesPageStep5] 응답 status:", res.status);
+      console.log("🟩 [SpacesPageStep5] 응답 headers:", res.headers);
+      console.log("🟩 [SpacesPageStep5] 응답 data:", res.data);
+
+      if (res.status === 201) {
+        // 성공적으로 생성됨
+        navigate(ROUTE_PATH.MONITOR);
+        return;
+      } else {
+        console.warn(
+          "🟨 [SpacesPageStep5] 예상치 못한 상태 코드:",
+          res.status,
+          res.data
+        );
+        alert("등록에 실패했습니다. 잠시 후 다시 시도해주세요.");
+      }
+    } catch (e: any) {
+      // axios 오류 상세 출력
+      if (e.response) {
+        // 서버가 4xx/5xx 응답을 반환
+        console.error(
+          "🔴 [SpacesPageStep5] API 실패 (response):",
+          e.response.status,
+          e.response.data
+        );
+        alert(
+          `서버 오류가 발생했습니다. (status: ${e.response.status})\n잠시 후 다시 시도해주세요.`
+        );
+      } else if (e.request) {
+        // 요청은 전송되었으나 응답이 없음
+        console.error(
+          "🔴 [SpacesPageStep5] API 실패 (no response):",
+          e.request
+        );
+        alert("서버 응답이 없습니다. 네트워크를 확인해주세요.");
+      } else {
+        // 요청 설정 중 에러
+        console.error("🔴 [SpacesPageStep5] API 설정 오류:", e.message);
+        alert("요청 설정 중 오류가 발생했습니다.");
+      }
+      return;
+    }
+
+    // 5) (대체 경로) API 미사용일 때 테스트용 화면 이동하려면 아래 주석을 해제
+    // navigate(ROUTE_PATH.MONITOR);
   };
 
   return (
@@ -170,10 +209,10 @@ export default function SpacesPageStep5() {
                 setPrice(e.target.value === "" ? "" : Number(e.target.value))
               }
               className="w-28 h-8 rounded border border-neutral-300 bg-neutral-100 text-sm text-black px-2 
-                             outline-none 
-                             [&::-webkit-outer-spin-button]:appearance-none 
-                             [&::-webkit-inner-spin-button]:appearance-none 
-                             [appearance:textfield]"
+                         outline-none 
+                         [&::-webkit-outer-spin-button]:appearance-none 
+                         [&::-webkit-inner-spin-button]:appearance-none 
+                         [appearance:textfield]"
               placeholder="0"
             />
             <span className="text-blue-600 text-2xl font-bold">P</span>
@@ -186,7 +225,7 @@ export default function SpacesPageStep5() {
               type="button"
               onClick={() => {}}
               className="w-32 h-8 px-2 bg-blue-500 rounded text-white text-xs font-bold 
-                             inline-flex items-center justify-center cursor-pointer active:opacity-90"
+                         inline-flex items-center justify-center cursor-pointer active:opacity-90"
             >
               AI 추천 사용하기
             </button>
