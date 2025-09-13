@@ -1,3 +1,8 @@
+
+<img width="1857" height="1047" alt="image" src="https://github.com/user-attachments/assets/d081dbc6-fe97-4cef-b3f5-586aa23ecb8e" />
+
+<br>
+
 # 📌 프로젝트 이름
 CampusPark_대학가 주차 공유 플랫폼
 
@@ -11,13 +16,13 @@ CampusPark_대학가 주차 공유 플랫폼
 # 🛠 기술 스택 (Tech Stack)
 • Frontend: React, TypeScript, TailwindCSS
 
-• Backend: Node.js, Express, Spring Boot …
+• Backend: Spring Boot, Spring Data Jpa
 
-• Database: MySQL, MongoDB …
+• Database: MySQL
 
-• Infra/DevOps: AWS S3, CloudFront, GitHub Actions …
+• Infra/DevOps: AWS S3, CloudFront, GitHub Actions
 
-• Tools: Figma, Notion, GIT, GITHUB, Postman …
+• Tools: Figma, Notion, GIT, GITHUB, Postman
 
 
 
