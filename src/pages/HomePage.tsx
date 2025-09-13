@@ -112,7 +112,7 @@ function SpotCard({ spot }: { spot: Spot }) {
           <img
             src="/assets/mypage_temperature.svg"
             alt="temperature icon"
-            className="w-4 h-4"
+            className="w-5 h-5"
           />
           <span className="text-xs font-semibold text-amber-500">
             {spot.manner}
