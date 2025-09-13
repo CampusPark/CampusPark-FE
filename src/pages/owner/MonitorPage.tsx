@@ -5,6 +5,7 @@ import PrimaryButton from "@/components/PrimaryButton";
 import Header from "@/components/Header";
 import BottomNav from "@/components/layout/BottomNav";
 import { ROUTE_PATH } from "@/routes/paths";
+import { useLocation } from "react-router-dom";
 
 type LocalSubmission = {
   id: string;
@@ -49,6 +50,8 @@ function buildCardProps(p: LocalSubmission["payload"]) {
 
 export default function MonitorPage() {
   const navigate = useNavigate();
+  const { pathname } = useLocation();
+  const isFromMyPage = pathname.startsWith("/mypage");
 
   const submissions = React.useMemo<LocalSubmission[]>(() => {
     try {
@@ -68,7 +71,20 @@ export default function MonitorPage() {
 
   return (
     <div className="flex-1 flex flex-col items-stretch bg-neutral-50">
-      <Header title="내 공간 등록하기" />
+      {isFromMyPage ? (
+        <Header
+          title="내 주차 공간 관리"
+          left={
+            <img
+              src="/assets/goBackButtonImg.svg"
+              alt="뒤로 가기"
+              className="w-6 h-6"
+            />
+          }
+        />
+      ) : (
+        <Header title="내 공간 등록하기" />
+      )}
 
       <div className="w-full px-4 sm:px-4 py-1 flex flex-col justify-center items-start gap-3 overflow-hidden">
         <div className="w-full inline-flex justify-start items-center gap-2.5 overflow-hidden">
@@ -116,7 +132,7 @@ export default function MonitorPage() {
         </PrimaryButton>
       </div>
 
-      <BottomNav />
+      {!isFromMyPage && <BottomNav />}
     </div>
   );
 }
