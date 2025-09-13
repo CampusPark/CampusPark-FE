@@ -2,6 +2,21 @@ import { useEffect, useRef, useState } from "react";
 import type { STTAdapter, STTResultHandler } from "@/ai/sttAdapters";
 import { WebSpeechSTT } from "@/ai/sttAdapters";
 
+// ✅ STT API 함수들
+import {
+  sttFetchNearbyList,
+  sttFetchDetail,
+  sttReserveByText,
+  getUserId,
+} from "@/api/stt";
+
+// ✅ 타입은 type-only import (verbatimModuleSyntax 대응)
+import type {
+  STTListItem,
+  STTDetailResponse,
+  STTReserveResponse,
+} from "@/api/stt";
+
 /** ===== props: 기존과 동일 ===== */
 type Props = {
   open?: boolean;
@@ -9,83 +24,6 @@ type Props = {
   onSubmitText?: (text: string) => void;
   silenceMs?: number;
   sttImpl?: STTAdapter;
-};
-
-/** ===== 백엔드 설정 ===== */
-const API_BASE_URL = import.meta.env.VITE_API_BASE_URL ?? "";
-const USER_ID = 1; // 로그인 연동 전 임시
-
-/** 공통 fetch helper */
-async function api<T>(
-  path: string,
-  options: RequestInit & { query?: Record<string, string | number> } = {}
-): Promise<T> {
-  const url = new URL(path, API_BASE_URL || window.location.origin);
-  if (options.query) {
-    Object.entries(options.query).forEach(([k, v]) =>
-      url.searchParams.set(k, String(v))
-    );
-  }
-  const res = await fetch(url.toString(), {
-    headers: { "Content-Type": "application/json", ...(options.headers || {}) },
-    ...options,
-  });
-  if (!res.ok) {
-    const body = await res.text().catch(() => "");
-    throw new Error(`HTTP ${res.status} ${res.statusText} ${body}`);
-  }
-  return res.json() as Promise<T>;
-}
-
-/** 응답 타입 (명세 기반) */
-type STTListItem = {
-  id: number;
-  address: string;
-  latitude: number;
-  longitude: number;
-  availableStartTime: string;
-  availableEndTime: string;
-  price: number;
-  status: boolean;
-  availableCount: number;
-};
-type STTListResponse = {
-  success: boolean;
-  data: STTListItem[];
-  timestamp: string;
-};
-
-type STTDetailResponse = {
-  success: boolean;
-  data: {
-    parkingSpace: {
-      id: number;
-      address: string;
-      latitude: number;
-      longitude: number;
-      availableStartTime: string; // "HH:mm:ss"
-      availableEndTime: string; // "HH:mm:ss"
-      price: number;
-      status: boolean;
-      availableCount: number;
-    };
-    availableTimeSlots: Array<{ startTime: string; endTime: string }>;
-  };
-  timestamp: string;
-};
-
-type STTReserveResponse = {
-  success: boolean;
-  message: string;
-  data: {
-    id: number;
-    userId: number;
-    parkingSpaceId: number;
-    startTime: string;
-    endTime: string;
-    status: string; // RESERVED
-  };
-  timestamp: string;
 };
 
 /** 유틸: 첫 문장(주소 후보), 두번째 문장(시간 후보) 나누기 */
@@ -118,7 +56,7 @@ export default function VoiceMicSheet({
   // list / 선택 상태
   const [listLoading, setListLoading] = useState(false);
   const [listData, setListData] = useState<STTListItem[]>([]);
-  const [_, setSelectedIndex] = useState<number | null>(null);
+  const [, setSelectedIndex] = useState<number | null>(null);
   const [detailLoading, setDetailLoading] = useState(false);
   const [detail, setDetail] = useState<STTDetailResponse["data"] | null>(null);
 
@@ -132,27 +70,38 @@ export default function VoiceMicSheet({
   const sttRef = useRef<STTAdapter | null>(null);
   const silenceTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
+  // 무음 타이머 리셋
   const resetSilenceTimer = () => {
     if (silenceTimerRef.current) clearTimeout(silenceTimerRef.current);
     silenceTimerRef.current = setTimeout(() => {
+      // 무음 종료
       stopSTT();
       setMsg("입력이 없어 음성 인식을 종료했어요.");
     }, silenceMs);
   };
 
+  // STT 시작
   const startSTT = async () => {
     const stt = sttImpl ?? new WebSpeechSTT();
     sttRef.current = stt;
+
     const onResult: STTResultHandler = (finalStr, interimStr) => {
-      if (finalStr.trim() || interimStr.trim()) resetSilenceTimer();
-      if (finalStr)
+      if (finalStr.trim() || interimStr.trim()) {
+        resetSilenceTimer(); // 말이 들리면 무음 타이머 리셋
+      }
+      if (finalStr) {
+        // 누적형
         setFinalText((prev) => (prev ? `${prev} ${finalStr}` : finalStr));
+      }
       setInterim(interimStr);
     };
+
     setMsg(null);
     setFinalText("");
     setInterim("");
     setListening(true);
+
+    // 단계/데이터 초기화
     setStep("idle");
     setListData([]);
     setSelectedIndex(null);
@@ -169,6 +118,7 @@ export default function VoiceMicSheet({
     }
   };
 
+  // STT 중지
   const stopSTT = async () => {
     setListening(false);
     try {
@@ -181,11 +131,21 @@ export default function VoiceMicSheet({
     }
   };
 
+  // open 변경에 따라 STT 자동 시작/정리
   useEffect(() => {
     if (!open) return;
+
+    // 열리면 자동 시작
     startSTT();
-    const onKey = (e: KeyboardEvent) => e.key === "Escape" && handleCancel();
+
+    // ESC/백드롭으로 닫기
+    const onKey = (e: KeyboardEvent) => {
+      if (e.key === "Escape") {
+        handleCancel();
+      }
+    };
     window.addEventListener("keydown", onKey);
+
     return () => {
       window.removeEventListener("keydown", onKey);
       stopSTT();
@@ -198,23 +158,18 @@ export default function VoiceMicSheet({
     onClose?.();
   };
 
-  /** Step1: 리스트 조회 */
+  /** Step1: 리스트 조회 (API: sttFetchNearbyList) */
   const fetchList = async (addressText: string) => {
-    if (!API_BASE_URL) {
-      setMsg("API 주소가 설정되지 않았습니다. (.env의 VITE_API_BASE_URL 확인)");
-      return;
-    }
     setListLoading(true);
     setMsg(null);
     try {
-      // 서버 명세가 GET + Body라 비표준. 서버가 허용한다면 GET으로, 일반적으론 POST를 권장.
-      // 여기서는 POST로 호출 (서버가 꼭 GET만 받으면 method를 GET으로 바꾸고 서버 설정 확인 필요)
-      const res = await api<STTListResponse>("/stt/list", {
-        method: "GET",
-        body: JSON.stringify({ address: addressText }),
+      const res = await sttFetchNearbyList({
+        userId: getUserId(),
+        address: addressText,
       });
       setListData(res.data ?? []);
       setStep("list");
+      console.log("[STT] list:", res.data);
     } catch (e: any) {
       setMsg(e.message || "리스트를 불러오지 못했습니다.");
     } finally {
@@ -222,18 +177,18 @@ export default function VoiceMicSheet({
     }
   };
 
-  /** Step2: 상세 (몇 번째) */
+  /** Step2: 상세 (몇 번째) (API: sttFetchDetail) */
   const fetchDetail = async (nth: number) => {
     setDetailLoading(true);
     setMsg(null);
     try {
-      const res = await api<STTDetailResponse>("/stt/detail", {
-        method: "POST",
-        query: { userId: USER_ID },
-        body: JSON.stringify({ text: `${nth}번째` }),
+      const res = await sttFetchDetail({
+        userId: getUserId(),
+        text: `${nth}번째`,
       });
       setDetail(res.data);
       setStep("detail");
+      console.log("[STT] detail:", res.data);
 
       // 음성에 시간이 없었다면 추천 슬롯으로 프리필
       const firstSlot = res.data.availableTimeSlots?.[0];
@@ -250,7 +205,7 @@ export default function VoiceMicSheet({
     }
   };
 
-  /** Step3: 예약 (자연어 text) */
+  /** Step3: 예약 (자연어 text) (API: sttReserveByText) */
   const doReserve = async () => {
     if (!detail?.parkingSpace?.id) {
       setMsg("선택된 주차공간이 없습니다.");
@@ -263,14 +218,15 @@ export default function VoiceMicSheet({
     setReserveLoading(true);
     setMsg(null);
     try {
-      const res = await api<STTReserveResponse>("/stt/reserve", {
-        method: "POST",
-        query: { userId: USER_ID, parkingSpaceId: detail.parkingSpace.id },
-        body: JSON.stringify({ text: reserveText.trim() }),
+      const res = await sttReserveByText({
+        userId: getUserId(),
+        parkingSpaceId: detail.parkingSpace.id,
+        text: reserveText.trim(),
       });
       setReserveResult(res);
       setStep("done");
       setMsg("예약이 완료되었습니다.");
+      console.log("[STT] reserve:", res.data);
     } catch (e: any) {
       setMsg(e.message || "예약에 실패했습니다.");
     } finally {
@@ -557,10 +513,11 @@ export default function VoiceMicSheet({
   );
 }
 
-/** 마이크 애니메이션 (그대로) */
+/** 듣는 중 링 애니메이션 + 마이크 버튼 */
 function MicAnimated({ listening }: { listening: boolean }) {
   return (
     <div className="relative grid place-items-center">
+      {/* 파형 링 */}
       <span
         className={[
           "absolute h-24 w-24 rounded-full bg-blue-200/40",
@@ -573,6 +530,7 @@ function MicAnimated({ listening }: { listening: boolean }) {
           listening ? "animate-ping-slower" : "opacity-0",
         ].join(" ")}
       />
+      {/* 메인 버튼 */}
       <button
         type="button"
         className={[
