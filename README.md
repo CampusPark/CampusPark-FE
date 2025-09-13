@@ -2,6 +2,8 @@
 <img width="1857" height="1047" alt="image" src="https://github.com/user-attachments/assets/d081dbc6-fe97-4cef-b3f5-586aa23ecb8e" />
 
 <br>
+### 배포 주소
+https://luminous-melba-20e1e6.netlify.app/
 
 # 📌 프로젝트 이름
 CampusPark_대학가 주차 공유 플랫폼
@@ -148,4 +150,7 @@ npm run start
 5. 매너온도 기반 신뢰도 시스템
 - 사용자의 부정 출차인증 등을 방지하기 위한 매너온도 시스템 도입(향후 개발 예정)
 - 주차공간 매너온도 시스템(평점)
+
+<br>
+API 명세서: https://vivacious-exoplanet-9f7.notion.site/API-26dc4d2de58780f6b2d0dbbb70fab64c?source=copy_link
 
