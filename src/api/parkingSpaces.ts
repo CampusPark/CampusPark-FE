@@ -16,7 +16,7 @@ const baseURL = import.meta.env.VITE_API_BASE_URL;
 
 /** 특정 주차 공간 상세 조회 */
 export async function getParkingSpace(spaceId: number) {
-  const url = `${baseURL}/parkingspaces/${spaceId}`;
+  const url = `${baseURL}/parking-spaces/${spaceId}`;
   const res = await axios.get<ParkingSpaceDetail>(url);
   return res.data;
 }
